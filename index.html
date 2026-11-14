@@ -32,7 +32,7 @@
   .tab-btn {
     background: var(--card); color: var(--muted); border: 1px solid var(--border);
     padding: 9px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.86rem;
-    transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
   }
   .tab-btn.active { background: var(--accent); color: #0f172a; border-color: var(--accent); }
   .tab-btn.admin-tab { border-color: var(--amber); color: var(--amber); }
@@ -164,9 +164,9 @@
     <span>Treinamento Técnico &amp; Estúdio de Projetos · MACNA Administradora Hoteleira</span>
   </div>
   <div class="tabs" id="main-tabs">
-    <button class="tab-btn active" data-target="mod1" onclick="switchTab('mod1', this)">1. Reservatório Superior (220V)</button>
-    <button class="tab-btn" data-target="mod2" onclick="switchTab('mod2', this)">2. Poço Drenagem Subsolo (380V)</button>
-    <button class="tab-btn admin-tab" data-target="studio" onclick="switchTab('studio', this)">➕ Novo / Editar Projeto</button>
+    <button type="button" class="tab-btn active" data-target="mod1">1. Reservatório Superior (220V)</button>
+    <button type="button" class="tab-btn" data-target="mod2">2. Poço Drenagem Subsolo (380V)</button>
+    <button type="button" id="btn-open-studio" class="tab-btn admin-tab" data-target="studio">+ Novo / Editar Projeto</button>
   </div>
 </header>
 
@@ -217,7 +217,7 @@
       <div class="controls-grid">
         <div class="ctrl-card">
           <label>Disjuntor Bipolar (Proteção)</label>
-          <button id="btn-m1-dj" class="btn btn-full btn-green" onclick="toggleM1Breaker()">LIGADO (ON)</button>
+          <button type="button" id="btn-m1-dj" class="btn btn-full btn-green">LIGADO (ON)</button>
         </div>
         <div class="ctrl-card">
           <label>Consumo Predial (Esvaziar Caixa)</label>
@@ -226,8 +226,8 @@
         <div class="ctrl-card">
           <label>Forçar Nível Manualmente</label>
           <div class="sel-group">
-            <button onclick="setM1Level(20)">20% (Vazia)</button>
-            <button onclick="setM1Level(90)">90% (Cheia)</button>
+            <button type="button" id="btn-m1-20">20% (Vazia)</button>
+            <button type="button" id="btn-m1-90">90% (Cheia)</button>
           </div>
         </div>
       </div>
@@ -276,7 +276,7 @@
       </div>
 
       <div id="m2-flood-alert" class="alert-banner">
-        🚨 ALERTA DE INUNDAÇÃO (NÍVEL ≥ 65%): Boia de Emergência acionou a bomba imediatamente e disparou alarme!
+        ALERTA DE INUNDAÇÃO (NÍVEL ≥ 65%): Boia de Emergência acionou a bomba imediatamente e disparou alarme!
       </div>
 
       <svg viewBox="0 0 580 340">
@@ -337,30 +337,30 @@
       <div class="controls-grid">
         <div class="ctrl-card">
           <label>Disjuntor-Motor Tripolar</label>
-          <button id="btn-m2-dj" class="btn btn-full btn-green" onclick="toggleM2Breaker()">LIGADO (ON)</button>
+          <button type="button" id="btn-m2-dj" class="btn btn-full btn-green">LIGADO (ON)</button>
         </div>
         <div class="ctrl-card">
           <label>Chave Seletora de Comando</label>
           <div class="sel-group">
-            <button id="sel-man" onclick="setM2Mode('MAN')">MAN</button>
-            <button id="sel-0" onclick="setM2Mode('0')">0</button>
-            <button id="sel-aut" class="active" onclick="setM2Mode('AUT')">AUT</button>
+            <button type="button" id="sel-man">MAN</button>
+            <button type="button" id="sel-0">0</button>
+            <button type="button" id="sel-aut" class="active">AUT</button>
           </div>
         </div>
         <div class="ctrl-card">
           <label>Simulação Temporizador (5 min)</label>
           <div class="sel-group">
-            <button id="spd-1" class="active" onclick="setSpeed(1)">1x</button>
-            <button id="spd-10" onclick="setSpeed(10)">10x</button>
-            <button id="spd-60" onclick="setSpeed(60)">60x</button>
-            <button class="btn-blue" onclick="skipTimer()">Pular</button>
+            <button type="button" id="spd-1" class="active">1x</button>
+            <button type="button" id="spd-10">10x</button>
+            <button type="button" id="spd-60">60x</button>
+            <button type="button" id="btn-skip" class="btn-blue">Pular</button>
           </div>
         </div>
         <div class="ctrl-card">
           <label>Injeção de Falhas (Treinamento)</label>
           <div class="sel-group">
-            <button id="btn-f-l2" class="btn-slate" onclick="toggleFaultL2()">Falta L2</button>
-            <button id="btn-f-seq" class="btn-slate" onclick="toggleFaultSeq()">Inv. Fase</button>
+            <button type="button" id="btn-f-l2" class="btn-slate">Falta L2</button>
+            <button type="button" id="btn-f-seq" class="btn-slate">Inv. Fase</button>
           </div>
         </div>
       </div>
@@ -368,10 +368,10 @@
       <div>
         <small style="color:var(--muted); font-weight:700; display:block; margin-bottom:6px;">CENÁRIOS GUIADOS DE TREINAMENTO:</small>
         <div class="scenario-btns">
-          <button class="btn btn-slate" onclick="runScenario('dry')">1. Poço Seco (Proteção Boia 1)</button>
-          <button class="btn btn-slate" onclick="runScenario('cycle')">2. Ciclo Normal 5 min + Drenagem</button>
-          <button class="btn btn-amber" onclick="runScenario('flood')">3. Chuva Forte / Nível Alto (Boia 2)</button>
-          <button class="btn btn-red" onclick="runScenario('phase')">4. Queda de Fase L2 no QGBT</button>
+          <button type="button" id="sc-dry" class="btn btn-slate">1. Poço Seco (Proteção Boia 1)</button>
+          <button type="button" id="sc-cycle" class="btn btn-slate">2. Ciclo Normal 5 min + Drenagem</button>
+          <button type="button" id="sc-flood" class="btn btn-amber">3. Chuva Forte / Nível Alto (Boia 2)</button>
+          <button type="button" id="sc-phase" class="btn btn-red">4. Queda de Fase L2 no QGBT</button>
         </div>
       </div>
     </div>
@@ -421,7 +421,7 @@
     <div class="studio-grid">
       <div class="panel">
         <div class="panel-title">
-          <span>📋 Adicionar ou Editar Módulo (Cole o Código Aqui)</span>
+          <span>Adicionar ou Editar Módulo (Cole o Código Aqui)</span>
           <span class="badge badge-warn">ESTÚDIO RÁPIDO</span>
         </div>
 
@@ -438,12 +438,12 @@
 
         <div class="form-group">
           <label for="proj-code">Cole aqui o novo código HTML completo:</label>
-          <textarea id="proj-code" placeholder="<!DOCTYPE html>&#10;<html>&#10;  ... cole todo o código aqui ...&#10;</html>"></textarea>
+          <textarea id="proj-code" placeholder="Cole aqui todo o código HTML do novo módulo..."></textarea>
         </div>
 
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn btn-green" style="flex:1;" onclick="saveCustomProject()">💾 Salvar e Abrir Aba no Site</button>
-          <button class="btn btn-slate" onclick="clearEditor()">Limpar Campos</button>
+          <button type="button" id="btn-save-proj" class="btn btn-green" style="flex:1;">Salvar e Abrir Aba no Site</button>
+          <button type="button" id="btn-clear-proj" class="btn btn-slate">Limpar Campos</button>
         </div>
 
         <div id="studio-msg" class="status-msg"></div>
@@ -451,8 +451,8 @@
 
       <div class="panel">
         <div class="panel-title">
-          <span>📂 Projetos Criados neste Site</span>
-          <button class="btn btn-blue" style="padding:5px 10px; font-size:0.78rem;" onclick="downloadFullSiteHTML()">⬇️ Baixar Site Completo (index.html)</button>
+          <span>Projetos Criados neste Site</span>
+          <button type="button" id="btn-download-site" class="btn btn-blue" style="padding:5px 10px; font-size:0.78rem;">Baixar Site Completo (index.html)</button>
         </div>
 
         <div id="custom-projects-list">
@@ -461,7 +461,7 @@
 
         <div style="border-top:1px solid var(--border); padding-top:14px; margin-top:auto;">
           <strong style="font-size:0.9rem; color:var(--accent); display:block; margin-bottom:6px;">
-            🚀 Publicação Automática no GitHub / Cloudflare (Opcional)
+            Publicação Automática no GitHub / Cloudflare (Opcional)
           </strong>
           <p style="font-size:0.8rem; color:var(--muted); margin-bottom:10px; line-height:1.4;">
             Para que todos da equipe vejam os novos projetos no link público, você pode baixar o <code>index.html</code> atualizado acima e subir no GitHub, <strong>ou</strong> colar seu Token do GitHub abaixo para publicar com 1 clique:
@@ -472,7 +472,7 @@
             <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
           </div>
 
-          <button class="btn btn-amber btn-full" onclick="publishToGitHub()">☁️ Publicar Alterações Direto no GitHub</button>
+          <button type="button" id="btn-publish-gh" class="btn btn-amber btn-full">Publicar Alterações Direto no GitHub</button>
           <div id="gh-msg" class="status-msg"></div>
         </div>
       </div>
@@ -489,7 +489,8 @@
 </script>
 
 <script>
-  const STORAGE_KEY = 'vivenzo_lab_custom_projects_v1';
+(function() {
+  const STORAGE_KEY = 'vivenzo_lab_custom_projects_v2';
   const GH_TOKEN_KEY = 'vivenzo_gh_token_v1';
   const GH_OWNER = 'edu00711811-oss';
   const GH_REPO = 'vivenzo-laboratorio-automacoes';
@@ -497,34 +498,59 @@
 
   function loadProjects() {
     try {
-      const local = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      if (Array.isArray(local) && local.length > 0) return local;
-      if (Array.isArray(window.EMBEDDED_PROJECTS) && window.EMBEDDED_PROJECTS.length > 0) {
-        return window.EMBEDDED_PROJECTS;
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {}
+    if (Array.isArray(window.EMBEDDED_PROJECTS)) {
+      return window.EMBEDDED_PROJECTS;
+    }
     return [];
   }
 
   let customProjects = loadProjects();
 
-  function persistProjects() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(customProjects));
-    renderCustomModules();
+  function switchTab(id) {
+    document.querySelectorAll('.module').forEach(function(m) {
+      m.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+      b.classList.remove('active');
+    });
+    const targetSec = document.getElementById(id);
+    if (targetSec) targetSec.classList.add('active');
+    const targetBtn = document.querySelector('.tab-btn[data-target="' + id + '"]');
+    if (targetBtn) targetBtn.classList.add('active');
   }
 
-  function switchTab(id, btn) {
-    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    const target = document.getElementById(id);
-    if (target) target.classList.add('active');
-    if (btn) btn.classList.add('active');
-  }
+  // Delegação global para todos os cliques nas abas do topo
+  document.getElementById('main-tabs').addEventListener('click', function(e) {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    const target = btn.getAttribute('data-target');
+    if (target) switchTab(target);
+  });
 
   function showStatus(elId, text, isOk) {
     const el = document.getElementById(elId);
+    if (!el) return;
     el.textContent = text;
     el.className = 'status-msg ' + (isOk ? 'ok' : 'err');
+  }
+
+  function persistProjects() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(customProjects));
+    } catch (e) {}
+    renderCustomModules();
+  }
+
+  function clearEditor() {
+    document.getElementById('edit-proj-id').value = '';
+    document.getElementById('proj-title').value = '';
+    document.getElementById('proj-code').value = '';
   }
 
   function saveCustomProject() {
@@ -539,58 +565,50 @@
 
     let targetId = editId;
     if (editId) {
-      const idx = customProjects.findIndex(p => p.id === editId);
+      const idx = customProjects.findIndex(function(p) { return p.id === editId; });
       if (idx !== -1) {
         customProjects[idx].title = title;
         customProjects[idx].code = code;
       }
     } else {
       targetId = 'custom_' + Date.now();
-      customProjects.push({ id: targetId, title, code });
+      customProjects.push({ id: targetId, title: title, code: code });
     }
 
     persistProjects();
     clearEditor();
-    showStatus('studio-msg', `Projeto "${title}" salvo e ativado na barra superior!`, true);
-
-    const newBtn = document.querySelector(`.tab-btn[data-target="${targetId}"]`);
-    if (newBtn) switchTab(targetId, newBtn);
+    showStatus('studio-msg', 'Projeto "' + title + '" salvo e ativado na barra superior!', true);
+    switchTab(targetId);
   }
 
   function editProject(id) {
-    const proj = customProjects.find(p => p.id === id);
+    const proj = customProjects.find(function(p) { return p.id === id; });
     if (!proj) return;
     document.getElementById('edit-proj-id').value = proj.id;
     document.getElementById('proj-title').value = proj.title;
     document.getElementById('proj-code').value = proj.code;
-    const studioBtn = document.querySelector('.tab-btn[data-target="studio"]');
-    switchTab('studio', studioBtn);
-    showStatus('studio-msg', `Editando "${proj.title}". Cole o novo código e clique em Salvar.`, true);
+    switchTab('studio');
+    showStatus('studio-msg', 'Editando "' + proj.title + '". Cole o novo código e clique em Salvar.', true);
   }
 
   function deleteProject(id) {
-    const proj = customProjects.find(p => p.id === id);
+    const proj = customProjects.find(function(p) { return p.id === id; });
     if (!proj) return;
-    if (!confirm(`Remover o projeto "${proj.title}"?`)) return;
-    customProjects = customProjects.filter(p => p.id !== id);
+    if (!confirm('Remover o projeto "' + proj.title + '"?')) return;
+    customProjects = customProjects.filter(function(p) { return p.id !== id; });
     persistProjects();
-    showStatus('studio-msg', `Projeto "${proj.title}" removido.`, true);
-  }
-
-  function clearEditor() {
-    document.getElementById('edit-proj-id').value = '';
-    document.getElementById('proj-title').value = '';
-    document.getElementById('proj-code').value = '';
+    switchTab('studio');
+    showStatus('studio-msg', 'Projeto "' + proj.title + '" removido.', true);
   }
 
   function renderCustomModules() {
     const tabsBar = document.getElementById('main-tabs');
-    const studioBtn = tabsBar.querySelector('.admin-tab');
+    const studioBtn = document.getElementById('btn-open-studio');
     const container = document.getElementById('main-container');
     const listBox = document.getElementById('custom-projects-list');
 
-    tabsBar.querySelectorAll('.custom-tab').forEach(el => el.remove());
-    container.querySelectorAll('.custom-section').forEach(el => el.remove());
+    tabsBar.querySelectorAll('.custom-tab').forEach(function(el) { el.remove(); });
+    container.querySelectorAll('.custom-section').forEach(function(el) { el.remove(); });
 
     if (customProjects.length === 0) {
       listBox.innerHTML = '<p style="font-size:0.85rem; color:var(--muted);">Nenhum módulo extra criado ainda. Use a caixa ao lado para colar seu primeiro código.</p>';
@@ -599,62 +617,131 @@
 
     listBox.innerHTML = '';
 
-    customProjects.forEach(proj => {
+    customProjects.forEach(function(proj) {
+      // Botão da aba
       const btn = document.createElement('button');
+      btn.type = 'button';
       btn.className = 'tab-btn custom-tab';
       btn.setAttribute('data-target', proj.id);
       btn.textContent = proj.title;
-      btn.onclick = () => switchTab(proj.id, btn);
       tabsBar.insertBefore(btn, studioBtn);
 
+      // Seção com iframe
       const sec = document.createElement('section');
       sec.id = proj.id;
       sec.className = 'module single-col custom-section';
-      sec.innerHTML = `
-        <div class="panel" style="padding:12px;">
-          <div class="panel-title">
-            <span>${proj.title}</span>
-            <div style="display:flex; gap:8px;">
-              <button class="btn btn-amber" style="padding:5px 10px; font-size:0.78rem;" onclick="editProject('${proj.id}')">✏️ Editar Código</button>
-              <button class="btn btn-red" style="padding:5px 10px; font-size:0.78rem;" onclick="deleteProject('${proj.id}')">🗑️ Excluir</button>
-            </div>
-          </div>
-          <iframe class="custom-iframe" sandbox="allow-scripts allow-forms allow-modals"></iframe>
-        </div>
-      `;
-      container.appendChild(sec);
-      sec.querySelector('iframe').srcdoc = proj.code;
 
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      panel.style.padding = '12px';
+
+      const pTitle = document.createElement('div');
+      pTitle.className = 'panel-title';
+
+      const spanTitle = document.createElement('span');
+      spanTitle.textContent = proj.title;
+
+      const btnGroup = document.createElement('div');
+      btnGroup.style.display = 'flex';
+      btnGroup.style.gap = '8px';
+
+      const bEdit = document.createElement('button');
+      bEdit.type = 'button';
+      bEdit.className = 'btn btn-amber';
+      bEdit.style.padding = '5px 10px';
+      bEdit.style.fontSize = '0.78rem';
+      bEdit.textContent = 'Editar Código';
+      bEdit.addEventListener('click', function() { editProject(proj.id); });
+
+      const bDel = document.createElement('button');
+      bDel.type = 'button';
+      bDel.className = 'btn btn-red';
+      bDel.style.padding = '5px 10px';
+      bDel.style.fontSize = '0.78rem';
+      bDel.textContent = 'Excluir';
+      bDel.addEventListener('click', function() { deleteProject(proj.id); });
+
+      btnGroup.appendChild(bEdit);
+      btnGroup.appendChild(bDel);
+      pTitle.appendChild(spanTitle);
+      pTitle.appendChild(btnGroup);
+
+      const iframe = document.createElement('iframe');
+      iframe.className = 'custom-iframe';
+      iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-modals');
+      iframe.srcdoc = proj.code;
+
+      panel.appendChild(pTitle);
+      panel.appendChild(iframe);
+      sec.appendChild(panel);
+      container.appendChild(sec);
+
+      // Card na lista do Estúdio
       const item = document.createElement('div');
       item.className = 'project-item';
-      item.innerHTML = `
-        <div>
-          <strong style="font-size:0.9rem; display:block;">${proj.title}</strong>
-          <small style="color:var(--muted);">Tamanho: ${(proj.code.length / 1024).toFixed(1)} KB</small>
-        </div>
-        <div style="display:flex; gap:6px;">
-          <button class="btn btn-blue" style="padding:6px 10px; font-size:0.78rem;" onclick="switchTab('${proj.id}', document.querySelector('.tab-btn[data-target=\\'${proj.id}\\']'))">Abrir</button>
-          <button class="btn btn-amber" style="padding:6px 10px; font-size:0.78rem;" onclick="editProject('${proj.id}')">Editar</button>
-          <button class="btn btn-red" style="padding:6px 10px; font-size:0.78rem;" onclick="deleteProject('${proj.id}')">Excluir</button>
-        </div>
-      `;
+
+      const info = document.createElement('div');
+      const strong = document.createElement('strong');
+      strong.style.fontSize = '0.9rem';
+      strong.style.display = 'block';
+      strong.textContent = proj.title;
+      const small = document.createElement('small');
+      small.style.color = 'var(--muted)';
+      small.textContent = 'Tamanho: ' + (proj.code.length / 1024).toFixed(1) + ' KB';
+      info.appendChild(strong);
+      info.appendChild(small);
+
+      const actions = document.createElement('div');
+      actions.style.display = 'flex';
+      actions.style.gap = '6px';
+
+      const aOpen = document.createElement('button');
+      aOpen.type = 'button';
+      aOpen.className = 'btn btn-blue';
+      aOpen.style.padding = '6px 10px';
+      aOpen.style.fontSize = '0.78rem';
+      aOpen.textContent = 'Abrir';
+      aOpen.addEventListener('click', function() { switchTab(proj.id); });
+
+      const aEdit = document.createElement('button');
+      aEdit.type = 'button';
+      aEdit.className = 'btn btn-amber';
+      aEdit.style.padding = '6px 10px';
+      aEdit.style.fontSize = '0.78rem';
+      aEdit.textContent = 'Editar';
+      aEdit.addEventListener('click', function() { editProject(proj.id); });
+
+      const aDel = document.createElement('button');
+      aDel.type = 'button';
+      aDel.className = 'btn btn-red';
+      aDel.style.padding = '6px 10px';
+      aDel.style.fontSize = '0.78rem';
+      aDel.textContent = 'Excluir';
+      aDel.addEventListener('click', function() { deleteProject(proj.id); });
+
+      actions.appendChild(aOpen);
+      actions.appendChild(aEdit);
+      actions.appendChild(aDel);
+
+      item.appendChild(info);
+      item.appendChild(actions);
       listBox.appendChild(item);
     });
   }
 
   function buildExportableHTML() {
     const clone = document.documentElement.cloneNode(true);
-    clone.querySelectorAll('.custom-tab, .custom-section').forEach(el => el.remove());
-    clone.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    clone.querySelectorAll('.custom-tab, .custom-section').forEach(function(el) { el.remove(); });
+    clone.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
     const firstTab = clone.querySelector('.tab-btn[data-target="mod1"]');
     if (firstTab) firstTab.classList.add('active');
-    clone.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+    clone.querySelectorAll('.module').forEach(function(m) { m.classList.remove('active'); });
     const firstMod = clone.querySelector('#mod1');
     if (firstMod) firstMod.classList.add('active');
 
     const dataScript = clone.querySelector('#custom-data-script');
     if (dataScript) {
-      dataScript.textContent = `\n  window.EMBEDDED_PROJECTS = ${JSON.stringify(customProjects)};\n`;
+      dataScript.textContent = '\n  window.EMBEDDED_PROJECTS = ' + JSON.stringify(customProjects) + ';\n';
     }
     return '<!DOCTYPE html>\n' + clone.outerHTML;
   }
@@ -666,31 +753,32 @@
     const a = document.createElement('a');
     a.href = url;
     a.download = 'index.html';
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    showStatus('gh-msg', 'Arquivo index.html completo baixado! Agora basta substituir no GitHub se desejar.', true);
+    showStatus('gh-msg', 'Arquivo index.html completo baixado! Basta substituir no GitHub para tornar permanente.', true);
   }
 
   async function publishToGitHub() {
-    const tokenInput = document.getElementById('gh-token');
-    const token = tokenInput.value.trim();
+    const token = document.getElementById('gh-token').value.trim();
     if (!token) {
       showStatus('gh-msg', 'Cole seu GitHub Personal Access Token acima para publicar direto.', false);
       return;
     }
-    localStorage.setItem(GH_TOKEN_KEY, token);
+    try { localStorage.setItem(GH_TOKEN_KEY, token); } catch (e) {}
     showStatus('gh-msg', 'Enviando atualização para o GitHub...', true);
 
     try {
-      const apiUrl = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`;
+      const apiUrl = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_PATH;
       const headers = {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': 'Bearer ' + token,
         'Accept': 'application/vnd.github+json',
         'Content-Type': 'application/json'
       };
 
       let sha = null;
-      const getRes = await fetch(apiUrl, { headers });
+      const getRes = await fetch(apiUrl, { headers: headers });
       if (getRes.ok) {
         const data = await getRes.json();
         sha = data.sha;
@@ -707,7 +795,7 @@
 
       const putRes = await fetch(apiUrl, {
         method: 'PUT',
-        headers,
+        headers: headers,
         body: JSON.stringify(body)
       });
 
@@ -716,29 +804,19 @@
         throw new Error(errData.message || 'Erro ao autenticar no GitHub.');
       }
 
-      showStatus('gh-msg', '✅ Publicado no GitHub com sucesso! A Cloudflare atualizará o link público em ~30 segundos.', true);
+      showStatus('gh-msg', 'Publicado no GitHub com sucesso! A Cloudflare atualizará o link público em ~30 segundos.', true);
     } catch (err) {
-      showStatus('gh-msg', '❌ Falha ao publicar: ' + err.message, false);
+      showStatus('gh-msg', 'Falha ao publicar: ' + err.message, false);
     }
   }
 
+  document.getElementById('btn-save-proj').addEventListener('click', saveCustomProject);
+  document.getElementById('btn-clear-proj').addEventListener('click', clearEditor);
+  document.getElementById('btn-download-site').addEventListener('click', downloadFullSiteHTML);
+  document.getElementById('btn-publish-gh').addEventListener('click', publishToGitHub);
+
   // ================= MÓDULO 1 =================
   let m1 = { dj: true, level: 25, boiaClosed: true };
-
-  function toggleM1Breaker() {
-    m1.dj = !m1.dj;
-    const btn = document.getElementById('btn-m1-dj');
-    btn.textContent = m1.dj ? 'LIGADO (ON)' : 'DESLIGADO (OFF)';
-    btn.className = m1.dj ? 'btn btn-full btn-green' : 'btn btn-full btn-red';
-    updateM1();
-  }
-
-  function setM1Level(val) {
-    m1.level = val;
-    if (m1.level <= 30) m1.boiaClosed = true;
-    if (m1.level >= 85) m1.boiaClosed = false;
-    updateM1();
-  }
 
   function updateM1() {
     if (m1.level <= 30) m1.boiaClosed = true;
@@ -746,7 +824,7 @@
 
     const pumpOn = m1.dj && m1.boiaClosed;
     document.getElementById('m1-water').style.height = m1.level + '%';
-    document.getElementById('m1-lvl-txt').textContent = `Nível: ${Math.round(m1.level)}%`;
+    document.getElementById('m1-lvl-txt').textContent = 'Nível: ' + Math.round(m1.level) + '%';
 
     const boiaIcon = document.getElementById('m1-boia-icon');
     boiaIcon.style.bottom = Math.min(88, Math.max(8, m1.level - 3)) + '%';
@@ -773,4 +851,201 @@
       pState.textContent = 'DESLIGADA'; pState.style.color = 'var(--muted)';
     }
 
-    document.getElementById('svg-m1-dj').textContent = m1.dj ? 'FECHADO (ON)' : 'ABERTO
+    document.getElementById('svg-m1-dj').textContent = m1.dj ? 'FECHADO (ON)' : 'ABERTO (OFF)';
+    document.getElementById('svg-m1-cont').textContent = pumpOn ? 'ATRACADA' : 'DESARMADA';
+    document.getElementById('svg-m1-pump').textContent = pumpOn ? 'BOMBANDO' : 'PARADA';
+    document.getElementById('svg-m1-boia').textContent = m1.boiaClosed ? 'NF (PEDINDO ÁGUA)' : 'ABERTA (CHEIA)';
+
+    document.getElementById('w-m1-l1').setAttribute('class', m1.dj ? 'wire-live' : 'wire-off');
+    document.getElementById('w-m1-a1').setAttribute('class', m1.dj ? 'wire-live' : 'wire-off');
+    document.getElementById('w-m1-t1').setAttribute('class', pumpOn ? 'wire-live' : 'wire-off');
+    document.getElementById('w-m1-t2').setAttribute('class', pumpOn ? 'wire-neutral' : 'wire-off');
+    document.getElementById('w-m1-boia-out').setAttribute('class', (m1.dj && m1.boiaClosed) ? 'wire-cmd' : 'wire-off');
+
+    document.getElementById('d-m1-l12').textContent = m1.dj ? '220 V' : '0 V (Disjuntor Aberto)';
+    document.getElementById('d-m1-coil').textContent = pumpOn ? '220 V (Energizada)' : '0 V (Desenergizada)';
+    document.getElementById('d-m1-boia').textContent = m1.boiaClosed ? 'Fechado (Nível ≤ 30%)' : 'Aberto (Nível ≥ 85%)';
+    document.getElementById('d-m1-t12').textContent = pumpOn ? '220 V (Bomba Ligada)' : '0 V (Bomba Parada)';
+  }
+
+  document.getElementById('btn-m1-dj').addEventListener('click', function() {
+    m1.dj = !m1.dj;
+    this.textContent = m1.dj ? 'LIGADO (ON)' : 'DESLIGADO (OFF)';
+    this.className = m1.dj ? 'btn btn-full btn-green' : 'btn btn-full btn-red';
+    updateM1();
+  });
+  document.getElementById('btn-m1-20').addEventListener('click', function() { m1.level = 20; m1.boiaClosed = true; updateM1(); });
+  document.getElementById('btn-m1-90').addEventListener('click', function() { m1.level = 90; m1.boiaClosed = false; updateM1(); });
+
+  // ================= MÓDULO 2 =================
+  let m2 = {
+    dj: true, mode: 'AUT', level: 40, faultL2: false, faultSeq: false,
+    speed: 1, timerState: 'OFF', timerSec: 300, pumpOn: false
+  };
+
+  function setM2Mode(mode) {
+    m2.mode = mode;
+    ['MAN', '0', 'AUT'].forEach(function(m) {
+      document.getElementById('sel-' + m.toLowerCase()).classList.toggle('active', m === mode);
+    });
+    updateM2();
+  }
+
+  function setSpeed(spd) {
+    m2.speed = spd;
+    [1, 10, 60].forEach(function(s) {
+      document.getElementById('spd-' + s).classList.toggle('active', s === spd);
+    });
+  }
+
+  function runScenario(type) {
+    m2.dj = true;
+    const btnDj = document.getElementById('btn-m2-dj');
+    btnDj.textContent = 'LIGADO (ON)';
+    btnDj.className = 'btn btn-full btn-green';
+    m2.faultL2 = false; m2.faultSeq = false;
+    document.getElementById('btn-f-l2').className = 'btn-slate';
+    document.getElementById('btn-f-seq').className = 'btn-slate';
+    setM2Mode('AUT');
+
+    if (type === 'dry') { m2.level = 15; m2.timerState = 'ON'; m2.timerSec = 60; }
+    else if (type === 'cycle') { m2.level = 45; m2.timerState = 'ON'; m2.timerSec = 60; setSpeed(10); }
+    else if (type === 'flood') { m2.level = 72; m2.timerState = 'OFF'; m2.timerSec = 240; }
+    else if (type === 'phase') { m2.level = 50; m2.faultL2 = true; document.getElementById('btn-f-l2').className = 'btn-red'; }
+    updateM2();
+  }
+
+  function fmtTime(sec) {
+    const s = Math.max(0, Math.ceil(sec));
+    return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  function updateM2() {
+    const rffOk = m2.dj && !m2.faultL2 && !m2.faultSeq;
+    const boia1Closed = m2.level >= 22;
+    const boia2Closed = m2.level >= 65;
+
+    let cmdActive = false;
+    if (rffOk) {
+      if (m2.mode === 'MAN') cmdActive = true;
+      else if (m2.mode === 'AUT') {
+        if (boia2Closed) cmdActive = true;
+        else if (boia1Closed && m2.timerState === 'ON') cmdActive = true;
+      }
+    }
+
+    m2.pumpOn = cmdActive;
+    document.getElementById('m2-water').style.height = m2.level + '%';
+    document.getElementById('m2-lvl-txt').textContent = 'Nível Poço: ' + Math.round(m2.level) + '%';
+    document.getElementById('m2-flood-alert').classList.toggle('show', boia2Closed);
+
+    const badge = document.getElementById('m2-status-badge');
+    if (!m2.dj) { badge.textContent = 'DISJUNTOR DESLIGADO'; badge.className = 'badge badge-off'; }
+    else if (!rffOk) {
+      badge.textContent = m2.faultL2 ? 'FALHA: FALTA DE FASE L2' : 'FALHA: SEQUÊNCIA DE FASE';
+      badge.className = 'badge badge-off';
+    } else if (boia2Closed) { badge.textContent = 'EMERGÊNCIA NÍVEL ALTO!'; badge.className = 'badge badge-off'; }
+    else if (!boia1Closed) { badge.textContent = 'BLOQUEIO: POÇO SECO (<22%)'; badge.className = 'badge badge-warn'; }
+    else if (m2.pumpOn) { badge.textContent = 'DRENANDO POÇO (380V)'; badge.className = 'badge badge-on'; }
+    else { badge.textContent = 'EM ESPERA (CICLO 5 MIN)'; badge.className = 'badge badge-on'; }
+
+    const rotor = document.getElementById('m2-rotor');
+    const pState = document.getElementById('m2-pump-state');
+    if (m2.pumpOn) {
+      rotor.classList.add('spinning');
+      pState.textContent = 'DRENANDO (380V 3Ø)'; pState.style.color = 'var(--green)';
+    } else {
+      rotor.classList.remove('spinning');
+      pState.textContent = 'PARADA'; pState.style.color = 'var(--muted)';
+    }
+
+    document.getElementById('m2-timer-display').textContent = m2.timerState === 'OFF'
+      ? 'Próx. ciclo: ' + fmtTime(m2.timerSec)
+      : 'Drenando ciclo: ' + fmtTime(m2.timerSec);
+
+    document.getElementById('svg-m2-dj').textContent = m2.dj ? 'FECHADO' : 'ABERTO';
+    document.getElementById('svg-m2-cont').textContent = m2.pumpOn ? 'ATRACADA' : 'ABERTA';
+    document.getElementById('svg-m2-pump').textContent = m2.pumpOn ? 'DRENANDO' : 'PARADA';
+    document.getElementById('svg-m2-rff').textContent = rffOk ? 'OK (15-18 FECH.)' : 'BLOQUEADO (ABERTO)';
+    document.getElementById('svg-m2-sel').textContent = m2.mode === 'MAN' ? 'MANUAL' : (m2.mode === '0' ? 'DESLIGADO (0)' : 'AUTOMÁTICO');
+    document.getElementById('svg-m2-b1').textContent = boia1Closed ? 'COM ÁGUA (FECH.)' : 'SECO (ABERTA)';
+    document.getElementById('svg-m2-b2').textContent = boia2Closed ? 'EMERGÊNCIA (FECH.)' : 'NORMAL (ABERTA)';
+    document.getElementById('svg-m2-tmr').textContent = m2.timerState === 'OFF' ? 'ESPERA: ' + fmtTime(m2.timerSec) : 'ATIVO: ' + fmtTime(m2.timerSec);
+
+    document.getElementById('w2-l2').setAttribute('class', m2.faultL2 ? 'wire-off' : 'wire-live');
+    document.getElementById('w2-p2').setAttribute('class', (m2.dj && !m2.faultL2) ? 'wire-live' : 'wire-off');
+    document.getElementById('w2-p1').setAttribute('class', m2.dj ? 'wire-live' : 'wire-off');
+    document.getElementById('w2-p3').setAttribute('class', m2.dj ? 'wire-live' : 'wire-off');
+    ['w2-t1', 'w2-t2', 'w2-t3'].forEach(function(id) { document.getElementById(id).setAttribute('class', m2.pumpOn ? 'wire-live' : 'wire-off'); });
+    document.getElementById('w2-a1').setAttribute('class', m2.pumpOn ? 'wire-cmd' : 'wire-off');
+
+    document.getElementById('d-m2-rff').textContent = rffOk ? 'OK (Contato 15-18 Fechado)' : (m2.faultL2 ? 'DESARMADO — Falta Fase L2!' : 'DESARMADO — Sequência Invertida!');
+    document.getElementById('d-m2-b1').textContent = boia1Closed ? 'Fechada (Nível ≥ 22%)' : 'Aberta (Proteção Trabalho a Seco)';
+    document.getElementById('d-m2-b2').textContent = boia2Closed ? 'FECHADA — Partida Forçada + Alarme!' : 'Aberta (Nível < 65%)';
+    document.getElementById('d-m2-tmr').textContent = m2.timerState === 'OFF' ? 'Intervalo 5 min (' + fmtTime(m2.timerSec) + ')' : 'Pulso Drenagem (' + fmtTime(m2.timerSec) + ')';
+    document.getElementById('d-m2-cont').textContent = m2.pumpOn ? '220V (Bobina Atracada)' : '0V (Desenergizada)';
+  }
+
+  document.getElementById('btn-m2-dj').addEventListener('click', function() {
+    m2.dj = !m2.dj;
+    this.textContent = m2.dj ? 'LIGADO (ON)' : 'DESLIGADO (OFF)';
+    this.className = m2.dj ? 'btn btn-full btn-green' : 'btn btn-full btn-red';
+    updateM2();
+  });
+  document.getElementById('sel-man').addEventListener('click', function() { setM2Mode('MAN'); });
+  document.getElementById('sel-0').addEventListener('click', function() { setM2Mode('0'); });
+  document.getElementById('sel-aut').addEventListener('click', function() { setM2Mode('AUT'); });
+  document.getElementById('spd-1').addEventListener('click', function() { setSpeed(1); });
+  document.getElementById('spd-10').addEventListener('click', function() { setSpeed(10); });
+  document.getElementById('spd-60').addEventListener('click', function() { setSpeed(60); });
+  document.getElementById('btn-skip').addEventListener('click', function() { m2.timerSec = 1; });
+  document.getElementById('btn-f-l2').addEventListener('click', function() {
+    m2.faultL2 = !m2.faultL2;
+    this.className = m2.faultL2 ? 'btn-red' : 'btn-slate';
+    updateM2();
+  });
+  document.getElementById('btn-f-seq').addEventListener('click', function() {
+    m2.faultSeq = !m2.faultSeq;
+    this.className = m2.faultSeq ? 'btn-amber' : 'btn-slate';
+    updateM2();
+  });
+  document.getElementById('sc-dry').addEventListener('click', function() { runScenario('dry'); });
+  document.getElementById('sc-cycle').addEventListener('click', function() { runScenario('cycle'); });
+  document.getElementById('sc-flood').addEventListener('click', function() { runScenario('flood'); });
+  document.getElementById('sc-phase').addEventListener('click', function() { runScenario('phase'); });
+
+  setInterval(function() {
+    const drain1 = parseFloat(document.getElementById('m1-drain').value) * 0.25;
+    m1.level = Math.max(0, m1.level - drain1);
+    if (m1.dj && m1.boiaClosed) m1.level = Math.min(100, m1.level + 1.8);
+    updateM1();
+
+    const inflow2 = parseFloat(document.getElementById('m2-inflow').value) * 0.25;
+    m2.level = Math.min(100, m2.level + inflow2);
+    if (m2.pumpOn) m2.level = Math.max(0, m2.level - 2.2);
+
+    const rffOk = m2.dj && !m2.faultL2 && !m2.faultSeq;
+    const boia1Closed = m2.level >= 22;
+    if (rffOk && m2.mode === 'AUT' && boia1Closed) {
+      m2.timerSec -= 0.25 * m2.speed;
+      if (m2.timerSec <= 0) {
+        if (m2.timerState === 'OFF') { m2.timerState = 'ON'; m2.timerSec = 60; }
+        else { m2.timerState = 'OFF'; m2.timerSec = 300; }
+      }
+    } else if (!boia1Closed && m2.timerState === 'ON') {
+      m2.timerState = 'OFF'; m2.timerSec = 300;
+    }
+    updateM2();
+  }, 250);
+
+  try {
+    const savedToken = localStorage.getItem(GH_TOKEN_KEY);
+    if (savedToken) document.getElementById('gh-token').value = savedToken;
+  } catch (e) {}
+  renderCustomModules();
+  updateM1();
+  updateM2();
+})();
+</script>
+</body>
+</html>
