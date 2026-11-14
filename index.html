@@ -1,216 +1,1411 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap');
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vivenzo · Laboratório de Automações</title>
+<style>
+  :root {
+    --bg: #0b1120;
+    --panel: #111827;
+    --card: #1e293b;
+    --border: #334155;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --green: #22c55e;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --blue: #3b82f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+  body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+  header {
+    background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .brand h1 { font-size: 1.3rem; font-weight: 700; color: #fff; }
+  .brand span { font-size: 0.82rem; color: var(--accent); display: block; margin-top: 2px; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tab-btn {
+    background: var(--card); color: var(--muted); border: 1px solid var(--border);
+    padding: 9px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.86rem;
+    transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .tab-btn.active { background: var(--accent); color: #0f172a; border-color: var(--accent); }
+  .tab-btn.admin-tab { border-color: var(--amber); color: var(--amber); }
+  .tab-btn.admin-tab.active { background: var(--amber); color: #0f172a; }
 
-:root {
-  --bg: #060a13;
-  --panel: #0d1423;
-  --card: #141d30;
-  --border: #222d45;
-  --text: #e8edf5;
-  --muted: #8896ae;
-  --accent: #4cc2f5;
-  --green: #34d399;
-  --red: #f87171;
-  --amber: #fbbf24;
-  --blue: #60a5fa;
-  --radius: 14px;
-  --shadow: 0 10px 30px -12px rgba(0,0,0,.6);
-  --mono: 'JetBrains Mono', Consolas, monospace;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-html { scroll-behavior: smooth; }
-body {
-  background: radial-gradient(1100px 500px at 15% -10%, rgba(76,194,245,.10), transparent 60%),
-              radial-gradient(900px 500px at 100% 0%, rgba(96,165,250,.07), transparent 55%), var(--bg);
-  color: var(--text); min-height: 100vh; display: flex; flex-direction: column;
-  -webkit-font-smoothing: antialiased; line-height: 1.5;
-}
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: #26324d; border-radius: 8px; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  main { flex: 1; padding: 20px 24px; max-width: 1480px; width: 100%; margin: 0 auto; }
+  .module { display: none; grid-template-columns: 1.45fr 1fr; gap: 20px; }
+  .module.active { display: grid; }
+  .module.single-col { grid-template-columns: 1fr; }
+  @media (max-width: 1080px) { .module { grid-template-columns: 1fr; } }
 
-/* Header */
-header {
-  position: sticky; top: 0; z-index: 20;
-  background: rgba(8,13,24,.78); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border);
-  padding: 14px 28px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px;
-}
-.brand { display: flex; align-items: center; gap: 14px; }
-.brand::before {
-  content: "⚡"; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; font-size: 1.25rem;
-  background: linear-gradient(135deg, #4cc2f5, #2563eb); box-shadow: 0 6px 18px -6px rgba(76,194,245,.7);
-}
-.brand h1 { font-size: 1.12rem; font-weight: 700; letter-spacing: -.01em; color: #fff; }
-.brand span { font-size: .76rem; color: var(--muted); display: block; margin-top: 2px; letter-spacing: .02em; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px; display: flex; flex-direction: column; gap: 16px;
+  }
+  .panel-title {
+    font-size: 1.05rem; font-weight: 700; color: #e2e8f0; border-bottom: 1px solid var(--border);
+    padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+  }
+  .badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 999px; font-weight: 700; }
+  .badge-on { background: rgba(34,197,94,0.2); color: var(--green); border: 1px solid var(--green); }
+  .badge-off { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid var(--red); }
+  .badge-warn { background: rgba(245,158,11,0.2); color: var(--amber); border: 1px solid var(--amber); }
 
-.tabs { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; background: #0a1120; border: 1px solid var(--border); padding: 4px; border-radius: 12px; }
-.tab-btn {
-  background: transparent; color: var(--muted); border: 1px solid transparent;
-  padding: 8px 14px; border-radius: 9px; cursor: pointer; font-weight: 600; font-size: .82rem;
-  transition: color .2s, background .2s, box-shadow .2s; display: inline-flex; align-items: center; gap: 6px;
-}
-.tab-btn:hover { color: var(--text); background: rgba(255,255,255,.05); }
-.tab-btn.active { background: linear-gradient(180deg, #5ccbf8, #38b2ea); color: #06121f; box-shadow: 0 4px 14px -4px rgba(76,194,245,.6); }
-.tab-btn.admin-tab { color: var(--amber); }
-.tab-btn.admin-tab.active { background: linear-gradient(180deg, #fcd34d, #f59e0b); color: #2a1503; box-shadow: 0 4px 14px -4px rgba(251,191,36,.5); }
+  /* Sub-tabs dentro do módulo (Diagrama vs Tabela Borne a Borne) */
+  .sub-tabs { display: flex; gap: 6px; background: #090d16; padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+  .sub-btn {
+    flex: 1; padding: 7px 10px; border: none; border-radius: 6px; background: transparent;
+    color: var(--muted); font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: 0.15s;
+  }
+  .sub-btn.active { background: var(--card); color: var(--accent); border: 1px solid var(--border); }
+  .sub-view { display: none; }
+  .sub-view.active { display: block; }
 
-/* Layout */
-main { flex: 1; padding: 26px 28px; max-width: 1440px; width: 100%; margin: 0 auto; }
-.module { display: none; grid-template-columns: 1.4fr 1fr; gap: 22px; }
-.module.active { display: grid; animation: fadeUp .35s ease; }
-.module.single-col { grid-template-columns: 1fr; }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@media (max-width: 1024px) { .module { grid-template-columns: 1fr; } }
-@media (max-width: 640px) { header, main { padding-left: 14px; padding-right: 14px; } }
+  /* Tabela Borne a Borne */
+  .borne-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; background: #090d16; }
+  .borne-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left; }
+  .borne-table th {
+    background: #1e293b; color: var(--accent); padding: 10px 10px;
+    border-bottom: 1px solid var(--border); font-weight: 700; white-space: nowrap;
+  }
+  .borne-table td { padding: 9px 10px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
+  .borne-table tr:hover td { background: rgba(56,189,248,0.06); }
+  .pin-tag {
+    display: inline-block; background: #0f172a; border: 1px solid #475569;
+    color: #f8fafc; font-family: monospace; font-weight: 700; padding: 2px 6px;
+    border-radius: 4px; font-size: 0.78rem;
+  }
+  .wire-pill {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 0.76rem; font-weight: 700;
+    padding: 2px 7px; border-radius: 999px; background: #1e293b;
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+  .state-live { color: var(--green); font-weight: 700; }
+  .state-dead { color: var(--muted); }
 
-.panel {
-  background: linear-gradient(180deg, rgba(20,29,48,.55), rgba(13,20,35,.9)), var(--panel);
-  border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
-  padding: 20px; display: flex; flex-direction: column; gap: 18px;
-}
-.panel-title {
-  font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .09em;
-  border-bottom: 1px solid var(--border); padding-bottom: 12px;
-  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-}
+  /* Controls */
+  .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .ctrl-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+  .ctrl-card label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+  .btn {
+    padding: 9px 14px; border-radius: 6px; border: none; font-weight: 700;
+    cursor: pointer; font-size: 0.85rem; transition: 0.15s;
+  }
+  .btn-full { width: 100%; }
+  .btn-green { background: var(--green); color: #052e16; }
+  .btn-red { background: var(--red); color: #fff; }
+  .btn-amber { background: var(--amber); color: #451a03; }
+  .btn-blue { background: var(--blue); color: #fff; }
+  .btn-slate { background: #475569; color: #fff; }
+  .btn:hover { opacity: 0.9; }
 
-.badge {
-  font-size: .7rem; padding: 4px 10px; border-radius: 999px; font-weight: 700; letter-spacing: .04em;
-  display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase;
-}
-.badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
-.badge-on { background: rgba(52,211,153,.12); color: var(--green); border: 1px solid rgba(52,211,153,.4); }
-.badge-off { background: rgba(248,113,113,.12); color: var(--red); border: 1px solid rgba(248,113,113,.45); }
-.badge-warn { background: rgba(251,191,36,.12); color: var(--amber); border: 1px solid rgba(251,191,36,.45); }
+  .sel-group { display: flex; gap: 4px; }
+  .sel-group button { flex: 1; padding: 8px 4px; border: 1px solid var(--border); background: #0f172a; color: var(--muted); border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 0.8rem; }
+  .sel-group button.active { background: var(--accent); color: #0f172a; border-color: var(--accent); }
+  input[type=range] { width: 100%; accent-color: var(--accent); cursor: pointer; }
 
-/* Controles */
-.controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
-.ctrl-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
-.ctrl-card label { display: block; font-size: .72rem; color: var(--muted); margin-bottom: 8px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+  /* Tank & Pump Visual */
+  .sim-stage { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: center; background: #090d16; border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .tank-wrap { display: flex; flex-direction: column; align-items: center; }
+  .tank {
+    width: 160px; height: 220px; border: 3px solid #64748b; border-top: none;
+    border-radius: 0 0 12px 12px; position: relative; overflow: hidden; background: #0f172a;
+  }
+  .water {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(180deg, rgba(56,189,248,0.75) 0%, rgba(2,132,199,0.9) 100%);
+    transition: height 0.25s linear;
+  }
+  .float-line {
+    position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.3);
+    font-size: 0.68rem; color: #cbd5e1; padding: 2px 4px; pointer-events: none;
+  }
+  .boia-icon {
+    position: absolute; right: 14px; width: 22px; height: 32px; border-radius: 6px;
+    background: var(--amber); border: 2px solid #fff; transition: transform 0.3s, bottom 0.25s linear;
+    display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 900; color: #000;
+  }
+  .pump-box { background: var(--card); border: 2px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; }
+  .rotor {
+    width: 54px; height: 54px; border-radius: 50%; border: 4px dashed var(--muted);
+    margin: 10px auto; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem;
+  }
+  .rotor.spinning { border-color: var(--green); color: var(--green); animation: spin 0.8s linear infinite; }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
 
-.btn {
-  padding: 10px 14px; border-radius: 9px; border: 1px solid transparent; font-weight: 700;
-  cursor: pointer; font-size: .84rem; transition: transform .15s, filter .15s, box-shadow .15s;
-}
-.btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
-.btn:active { transform: translateY(0); }
-.btn-full { width: 100%; }
-.btn-green { background: linear-gradient(180deg, #3ee0a5, #22b985); color: #04281c; box-shadow: 0 6px 16px -8px rgba(52,211,153,.8); }
-.btn-red { background: linear-gradient(180deg, #fb8a8a, #ef5b5b); color: #fff; box-shadow: 0 6px 16px -8px rgba(248,113,113,.8); }
-.btn-amber { background: linear-gradient(180deg, #fcd34d, #f59e0b); color: #2a1503; }
-.btn-blue { background: linear-gradient(180deg, #6aa9fb, #3b82f6); color: #fff; }
-.btn-slate { background: #26324d; color: #e2e8f0; border-color: #33415f; }
+  /* Schematic SVG */
+  svg { width: 100%; height: auto; background: #090d16; border-radius: 8px; border: 1px solid var(--border); }
+  .wire-off { stroke: #475569; stroke-width: 2.2; fill: none; }
+  .wire-live { stroke: #ef4444; stroke-width: 2.8; fill: none; }
+  .wire-l2 { stroke: #f97316; stroke-width: 2.8; fill: none; }
+  .wire-l3 { stroke: #eab308; stroke-width: 2.8; fill: none; }
+  .wire-neutral { stroke: #3b82f6; stroke-width: 2.5; fill: none; }
+  .wire-cmd { stroke: #22c55e; stroke-width: 2.6; fill: none; }
+  .comp-box { fill: #1e293b; stroke: #94a3b8; stroke-width: 1.5; }
+  .borne-dot { fill: #f8fafc; stroke: #0f172a; stroke-width: 1.2; }
+  .svg-txt { fill: #f8fafc; font-size: 11px; font-weight: 700; }
+  .svg-sub { fill: #94a3b8; font-size: 9px; }
+  .svg-pin { fill: #38bdf8; font-size: 8.8px; font-weight: 800; font-family: monospace; }
 
-.sel-group { display: flex; gap: 4px; background: #0a1120; padding: 3px; border-radius: 10px; border: 1px solid var(--border); }
-.sel-group button {
-  flex: 1; padding: 8px 4px; border: 0; background: transparent; color: var(--muted);
-  border-radius: 7px; cursor: pointer; font-weight: 700; font-size: .78rem; transition: .15s;
-}
-.sel-group button:hover { color: var(--text); background: rgba(255,255,255,.05); }
-.sel-group button.active { background: var(--accent); color: #06121f; }
-.sel-group button.btn-slate { background: #26324d; color: #e2e8f0; }
-.sel-group button.btn-red { background: var(--red); color: #fff; }
-.sel-group button.btn-amber { background: var(--amber); color: #2a1503; }
-.sel-group button.btn-blue { background: var(--blue); color: #fff; }
+  /* Diagnostics & Scenarios */
+  .diag-list { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; }
+  .diag-list li { background: var(--card); padding: 8px 12px; border-radius: 6px; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; gap: 8px; }
+  .scenario-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .alert-banner {
+    background: rgba(239,68,68,0.2); border: 1px solid var(--red); color: #fecaca;
+    padding: 10px 14px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; display: none;
+  }
+  .alert-banner.show { display: block; animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: 0.6; } }
 
-input[type=range] { width: 100%; accent-color: var(--accent); cursor: pointer; height: 6px; }
+  /* Studio / Paste Code Area */
+  .studio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .studio-grid { grid-template-columns: 1fr; } }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .form-group label { font-size: 0.85rem; font-weight: 700; color: #cbd5e1; }
+  input[type=text], input[type=password], textarea {
+    background: #090d16; border: 1px solid var(--border); color: #f8fafc;
+    padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; width: 100%;
+  }
+  textarea {
+    font-family: 'Consolas', 'Courier New', monospace; font-size: 0.82rem;
+    min-height: 240px; resize: vertical; line-height: 1.4;
+  }
+  .custom-iframe {
+    width: 100%; height: 74vh; border: 1px solid var(--border); border-radius: 10px; background: #fff;
+  }
+  .project-item {
+    background: var(--card); border: 1px solid var(--border); padding: 12px; border-radius: 8px;
+    display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px;
+  }
+  .status-msg {
+    padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; display: none; margin-top: 8px;
+  }
+  .status-msg.ok { display: block; background: rgba(34,197,94,0.15); border: 1px solid var(--green); color: #86efac; }
+  .status-msg.err { display: block; background: rgba(239,68,68,0.15); border: 1px solid var(--red); color: #fca5a5; }
+  footer { text-align: center; padding: 14px; font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
 
-/* Simulação hidráulica */
-.sim-stage {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: center;
-  background: radial-gradient(circle at 30% 20%, #0f1a2e, #070c17); border: 1px solid var(--border);
-  border-radius: 12px; padding: 20px;
-}
-@media (max-width: 480px) { .sim-stage { grid-template-columns: 1fr; } }
-.tank-wrap { display: flex; flex-direction: column; align-items: center; }
-.tank {
-  width: 160px; height: 220px; border: 2px solid #5b6b88; border-top: none;
-  border-radius: 0 0 14px 14px; position: relative; overflow: hidden;
-  background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,0) 40%), #0a1120;
-  box-shadow: inset 0 0 24px rgba(0,0,0,.5);
-}
-.water {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(180deg, rgba(76,194,245,.8) 0%, rgba(14,116,190,.95) 100%);
-  transition: height .25s linear; box-shadow: 0 -2px 14px rgba(76,194,245,.45);
-}
-.water::before {
-  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent); background-size: 60% 100%;
-  animation: shimmer 3s linear infinite;
-}
-@keyframes shimmer { from { background-position: -100% 0; } to { background-position: 200% 0; } }
-.float-line {
-  position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,.28);
-  font-size: .64rem; color: #cbd5e1; padding: 2px 6px; pointer-events: none; z-index: 2;
-}
-.boia-icon {
-  position: absolute; right: 14px; width: 24px; height: 32px; border-radius: 7px; z-index: 3;
-  background: var(--amber); border: 2px solid #fff; transition: transform .3s, bottom .25s linear;
-  display: flex; align-items: center; justify-content: center; font-size: .62rem; font-weight: 800; color: #000;
-  box-shadow: 0 4px 10px rgba(0,0,0,.4);
-}
-.pump-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
-.rotor {
-  width: 62px; height: 62px; border-radius: 50%; border: 3px dashed #4b5b78;
-  margin: 12px auto; display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: .72rem; font-family: var(--mono); color: var(--muted);
-}
-.rotor.spinning { border-color: var(--green); color: var(--green); animation: spin .8s linear infinite; box-shadow: 0 0 18px rgba(52,211,153,.35); }
-@keyframes spin { 100% { transform: rotate(360deg); } }
+<header>
+  <div class="brand">
+    <h1>Vivenzo · Laboratório de Automações</h1>
+    <span>Treinamento Técnico &amp; Estúdio de Projetos · MACNA Administradora Hoteleira</span>
+  </div>
+  <div class="tabs" id="main-tabs">
+    <button type="button" class="tab-btn active" data-target="mod1">1. Reservatório Superior (220V)</button>
+    <button type="button" class="tab-btn" data-target="mod2">2. Poço Drenagem Subsolo (380V)</button>
+    <button type="button" id="btn-open-studio" class="tab-btn admin-tab" data-target="studio">+ Novo / Editar Projeto</button>
+  </div>
+</header>
 
-/* Esquemático */
-svg { width: 100%; height: auto; background: radial-gradient(circle at 50% 0%, #0d1628, #070c17); border-radius: 12px; border: 1px solid var(--border); }
-.wire-off { stroke: #3b4963; stroke-width: 2.5; fill: none; }
-.wire-live, .wire-neutral, .wire-cmd { fill: none; stroke-linecap: round; stroke-dasharray: 7 5; animation: flow 1s linear infinite; }
-.wire-live { stroke: var(--red); stroke-width: 3; }
-.wire-neutral { stroke: var(--blue); stroke-width: 2.5; }
-.wire-cmd { stroke: var(--amber); stroke-width: 2.8; }
-@keyframes flow { to { stroke-dashoffset: -24; } }
-.comp-box { fill: #141d30; stroke: #5b6b88; stroke-width: 1.4; }
-.svg-txt { fill: #f1f5f9; font-size: 11px; font-weight: 700; }
-.svg-sub { fill: #8896ae; font-size: 9.5px; }
-#svg-m1-cont { fill: var(--green); }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+<main id="main-container">
+  <!-- ================= MÓDULO 1: RESERVATÓRIO SUPERIOR ================= -->
+  <section id="mod1" class="module active">
+    <div class="panel">
+      <div class="panel-title">
+        <span>Esquema Elétrico &amp; Conexões Borne a Borne (220V F+N)</span>
+        <span id="m1-status-badge" class="badge badge-on">SISTEMA PRONTO</span>
+      </div>
 
-/* Diagnóstico */
-.diag-list { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: .84rem; }
-.diag-list li {
-  background: var(--card); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border);
-  border-left: 3px solid var(--accent); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-}
-.diag-list li span { color: var(--muted); }
-.diag-list li strong { font-family: var(--mono); font-size: .78rem; font-weight: 500; }
-.scenario-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-@media (max-width: 560px) { .scenario-btns { grid-template-columns: 1fr; } }
-.alert-banner {
-  background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.5); color: #fecaca;
-  padding: 12px 16px; border-radius: 10px; font-weight: 600; font-size: .88rem; display: none;
-}
-.alert-banner.show { display: block; animation: pulse 1.2s infinite; }
-@keyframes pulse { 50% { opacity: .55; } }
+      <div class="sub-tabs" data-mod="m1">
+        <button type="button" class="sub-btn active" data-view="m1-svg-view">🔌 Diagrama com Bornes Numerados</button>
+        <button type="button" class="sub-btn" data-view="m1-table-view">📋 Tabela Borne a Borne (De → Para)</button>
+      </div>
 
-/* Estúdio */
-.studio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-@media (max-width: 900px) { .studio-grid { grid-template-columns: 1fr; } }
-.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-.form-group label { font-size: .8rem; font-weight: 600; color: #cbd5e1; }
-input[type=text], input[type=password], textarea {
-  background: #070c17; border: 1px solid var(--border); color: var(--text);
-  padding: 11px 13px; border-radius: 10px; font-size: .88rem; width: 100%; transition: border-color .2s, box-shadow .2s;
-}
-input[type=text]:focus, input[type=password]:focus, textarea:focus {
-  outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(76,194,245,.18);
-}
-textarea { font-family: var(--mono); font-size: .78rem; min-height: 240px; resize: vertical; line-height: 1.5; }
-.custom-iframe { width: 100%; height: 74vh; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
-.project-item {
-  background: var(--card); border: 1px solid var(--border); padding: 12px 14px; border-radius: 10px;
-  display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px;
-}
-.status-msg { padding: 10px 14px; border-radius: 10px; font-size: .84rem; font-weight: 500; display: none; margin-top: 8px; }
-.status-msg.ok { display: block; background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.4); color: #86efac; }
-.status-msg.err { display: block; background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.4); color: #fca5a5; }
-code { font-family: var(--mono); background: #070c17; padding: 1px 6px; border-radius: 5px; font-size: .78rem; }
+      <!-- VISÃO 1: DIAGRAMA SVG DETALHADO -->
+      <div id="m1-svg-view" class="sub-view active">
+        <svg viewBox="0 0 640 375">
+          <!-- Barramento Alimentação -->
+          <text x="20" y="20" class="svg-txt">ALIMENTAÇÃO QDC 220V (FASE + NEUTRO)</text>
+          <path d="M 55 28 L 55 68" class="wire-live"/>
+          <path d="M 115 28 L 115 68" class="wire-neutral"/>
+          <text x="32" y="45" class="svg-sub">L (Fase)</text>
+          <text x="122" y="45" class="svg-sub">N (Neutro)</text>
 
-footer { text-align: center; padding: 18px; font-size: .76rem; color: var(--muted); border-top: 1px solid var(--border); letter-spacing: .02em; }
+          <!-- Disjuntor Bipolar -->
+          <rect x="30" y="68" width="110" height="62" rx="6" class="comp-box"/>
+          <text x="53" y="85" class="svg-txt">DISJUNTOR</text>
+          <text x="48" y="99" class="svg-sub" id="svg-m1-dj">FECHADO (ON)</text>
+          <text x="50" y="79" class="svg-pin">1</text>
+          <text x="110" y="79" class="svg-pin">3</text>
+          <text x="50" y="124" class="svg-pin">2</text>
+          <text x="110" y="124" class="svg-pin">4</text>
+          <circle cx="55" cy="68" r="3" class="borne-dot"/><circle cx="115" cy="68" r="3" class="borne-dot"/>
+          <circle cx="55" cy="130" r="3" class="borne-dot"/><circle cx="115" cy="130" r="3" class="borne-dot"/>
+
+          <!-- Fiação Disjuntor -> Contatora e Boia -->
+          <path id="w-m1-l1" d="M 55 130 L 55 195 L 270 195 L 270 145" class="wire-live"/>
+          <text x="135" y="189" class="svg-sub">Cabo 2,5mm² Vermelho (DJ Borne 2 → Contatora L1)</text>
+
+          <path id="w-m1-a1" d="M 225 195 L 225 145" class="wire-live"/>
+          <text x="155" y="166" class="svg-sub">Jumper L1 → A1</text>
+
+          <path id="w-m1-l2" d="M 115 130 L 115 225 L 320 225 L 320 145" class="wire-neutral"/>
+          <text x="135" y="219" class="svg-sub">Cabo 2,5mm² Azul (DJ Borne 4 → Contatora L2)</text>
+
+          <!-- Contatora -->
+          <rect x="205" y="68" width="185" height="77" rx="6" class="comp-box"/>
+          <text x="242" y="86" class="svg-txt">CONTATORA 220V</text>
+          <text x="262" y="102" class="svg-txt" id="svg-m1-cont" fill="#22c55e">ATRACADA</text>
+          <!-- Bornes superiores -->
+          <text x="263" y="80" class="svg-pin">T1</text>
+          <text x="313" y="80" class="svg-pin">T2</text>
+          <circle cx="270" cy="68" r="3" class="borne-dot"/><circle cx="320" cy="68" r="3" class="borne-dot"/>
+          <!-- Bornes inferiores -->
+          <text x="218" y="139" class="svg-pin">A1</text>
+          <text x="263" y="139" class="svg-pin">L1</text>
+          <text x="313" y="139" class="svg-pin">L2</text>
+          <text x="360" y="139" class="svg-pin">A2</text>
+          <circle cx="225" cy="145" r="3" class="borne-dot"/><circle cx="270" cy="145" r="3" class="borne-dot"/>
+          <circle cx="320" cy="145" r="3" class="borne-dot"/><circle cx="368" cy="145" r="3" class="borne-dot"/>
+
+          <!-- Saída T1 e T2 -> Motobomba -->
+          <path id="w-m1-t1" d="M 270 68 L 270 34 L 495 34 L 495 75" class="wire-live"/>
+          <path id="w-m1-t2" d="M 320 68 L 320 48 L 545 48 L 545 75" class="wire-neutral"/>
+          <text x="340" y="29" class="svg-sub">T1 → Borne U1 (Fase)</text>
+          <text x="340" y="44" class="svg-sub">T2 → Borne U2 (Neutro)</text>
+
+          <rect x="465" y="75" width="130" height="65" rx="8" class="comp-box"/>
+          <text x="488" y="102" class="svg-txt">MOTOBOMBA</text>
+          <text x="495" y="118" class="svg-sub" id="svg-m1-pump">BOMBANDO</text>
+          <text x="488" y="86" class="svg-pin">U1</text>
+          <text x="538" y="86" class="svg-pin">U2</text>
+          <circle cx="495" cy="75" r="3" class="borne-dot"/><circle cx="545" cy="75" r="3" class="borne-dot"/>
+
+          <!-- Comando Chave Boia -->
+          <path id="w-m1-boia-in" d="M 165 225 L 165 315 L 435 315" class="wire-neutral"/>
+          <text x="175" y="308" class="svg-sub">Cabo 1,5mm² Azul (Neutro do Borne 4 DJ → Comum da Boia)</text>
+
+          <rect x="435" y="275" width="165" height="72" rx="6" class="comp-box"/>
+          <text x="455" y="295" class="svg-txt">CHAVE BOIA SUP.</text>
+          <text x="455" y="311" class="svg-sub" id="svg-m1-boia">NF (CAIXA BAIXA)</text>
+          <text x="442" y="320" class="svg-pin">COMUM (Preto)</text>
+          <text x="442" y="292" class="svg-pin">NF (Marrom)</text>
+          <circle cx="435" cy="315" r="3" class="borne-dot"/><circle cx="435" cy="288" r="3" class="borne-dot"/>
+
+          <path id="w-m1-boia-out" d="M 435 288 L 368 288 L 368 145" class="wire-cmd"/>
+          <text x="235" y="275" class="svg-sub">Retorno Comando 1,5mm² (NF Boia → Borne A2 Contatora)</text>
+        </svg>
+      </div>
+
+      <!-- VISÃO 2: TABELA BORNE A BORNE -->
+      <div id="m1-table-view" class="sub-view">
+        <div class="borne-table-wrap">
+          <table class="borne-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Origem (Componente / Borne)</th>
+                <th>Destino (Componente / Borne)</th>
+                <th>Cabo / Cor</th>
+                <th>Função &amp; Estado Atual</th>
+              </tr>
+            </thead>
+            <tbody id="m1-borne-tbody">
+              <tr>
+                <td>1</td>
+                <td>Barramento QDC <span class="pin-tag">FASE L</span></td>
+                <td>Disjuntor Bipolar <span class="pin-tag">Borne 1</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#ef4444;"></span>2,5mm² Vermelho</span></td>
+                <td>Entrada Fase Potência · <span id="bt-m1-1" class="state-live">220V</span></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Barramento QDC <span class="pin-tag">NEUTRO N</span></td>
+                <td>Disjuntor Bipolar <span class="pin-tag">Borne 3</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#3b82f6;"></span>2,5mm² Azul</span></td>
+                <td>Entrada Neutro Potência · <span id="bt-m1-2" class="state-live">0V (N)</span></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Disjuntor Bipolar <span class="pin-tag">Borne 2</span></td>
+                <td>Contatora <span class="pin-tag">Borne L1</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#ef4444;"></span>2,5mm² Vermelho</span></td>
+                <td>Alimentação Força L1 · <span id="bt-m1-3" class="state-live">Energizado</span></td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Disjuntor Bipolar <span class="pin-tag">Borne 4</span></td>
+                <td>Contatora <span class="pin-tag">Borne L2</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#3b82f6;"></span>2,5mm² Azul</span></td>
+                <td>Alimentação Força L2 · <span id="bt-m1-4" class="state-live">Conectado</span></td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Contatora <span class="pin-tag">Borne L1</span></td>
+                <td>Contatora <span class="pin-tag">Borne A1</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#ef4444;"></span>1,5mm² Vermelho</span></td>
+                <td>Jumper Fase Bobina · <span id="bt-m1-5" class="state-live">Energizado</span></td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>Disjuntor Bipolar <span class="pin-tag">Borne 4</span></td>
+                <td>Chave Boia Sup. <span class="pin-tag">Fio COMUM</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#3b82f6;"></span>1,5mm² Azul</span></td>
+                <td>Ida do Neutro p/ Boia · <span id="bt-m1-6" class="state-live">Conectado</span></td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>Chave Boia Sup. <span class="pin-tag">Contato NF</span></td>
+                <td>Contatora <span class="pin-tag">Borne A2</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#22c55e;"></span>1,5mm² Preto</span></td>
+                <td>Retorno Comando Bobina · <span id="bt-m1-7" class="state-live">Fechado</span></td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>Contatora <span class="pin-tag">Borne T1</span></td>
+                <td>Motobomba <span class="pin-tag">Borne U1</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#ef4444;"></span>2,5mm² Vermelho</span></td>
+                <td>Saída Carga Fase · <span id="bt-m1-8" class="state-live">220V</span></td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td>Contatora <span class="pin-tag">Borne T2</span></td>
+                <td>Motobomba <span class="pin-tag">Borne U2</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#3b82f6;"></span>2,5mm² Azul</span></td>
+                <td>Saída Carga Neutro · <span id="bt-m1-9" class="state-live">Fechado</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="controls-grid">
+        <div class="ctrl-card">
+          <label>Disjuntor Bipolar (Proteção)</label>
+          <button type="button" id="btn-m1-dj" class="btn btn-full btn-green">LIGADO (ON)</button>
+        </div>
+        <div class="ctrl-card">
+          <label>Consumo Predial (Esvaziar Caixa)</label>
+          <input type="range" id="m1-drain" min="0" max="5" step="0.5" value="1.5">
+        </div>
+        <div class="ctrl-card">
+          <label>Forçar Nível Manualmente</label>
+          <div class="sel-group">
+            <button type="button" id="btn-m1-20">20% (Vazia)</button>
+            <button type="button" id="btn-m1-90">90% (Cheia)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">
+        <span>Simulação Hidráulica &amp; Diagnóstico</span>
+        <span id="m1-lvl-txt" class="badge badge-on">Nível: 25%</span>
+      </div>
+
+      <div class="sim-stage">
+        <div class="tank-wrap">
+          <div class="tank">
+            <div class="float-line" style="bottom: 85%;">85% Desliga Boia</div>
+            <div class="float-line" style="bottom: 30%;">30% Liga Boia</div>
+            <div id="m1-water" class="water" style="height: 25%;"></div>
+            <div id="m1-boia-icon" class="boia-icon" style="bottom: 22%; transform: rotate(35deg);">NF</div>
+          </div>
+          <small style="margin-top:8px; color:var(--muted);">Reservatório Superior</small>
+        </div>
+
+        <div class="pump-box">
+          <strong style="font-size:0.95rem;">Motobomba Recalque</strong>
+          <div id="m1-rotor" class="rotor spinning">220V</div>
+          <div id="m1-pump-state" style="font-size:0.85rem; color:var(--green); font-weight:700;">EM OPERAÇÃO</div>
+          <small style="color:var(--muted); display:block; margin-top:6px;">Histerese: Liga ≤ 30% | Desliga ≥ 85%</small>
+        </div>
+      </div>
+
+      <ul class="diag-list">
+        <li><span>Tensão Borne L1 / L2:</span><strong id="d-m1-l12">220 V</strong></li>
+        <li><span>Bobina Contatora (A1 - A2):</span><strong id="d-m1-coil">220 V (Energizada)</strong></li>
+        <li><span>Contato Chave Boia (COM → NF):</span><strong id="d-m1-boia">Fechado (Caixa pedindo água)</strong></li>
+        <li><span>Saída Carga (T1/T2 → U1/U2):</span><strong id="d-m1-t12">220 V (Bomba Ligada)</strong></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= MÓDULO 2: POÇO DE DRENAGEM SUBSOLO ================= -->
+  <section id="mod2" class="module">
+    <div class="panel">
+      <div class="panel-title">
+        <span>Quadro de Drenagem Subsolo · 380V 3Ø (Borne a Borne)</span>
+        <span id="m2-status-badge" class="badge badge-on">NORMAL · AUTOMÁTICO</span>
+      </div>
+
+      <div id="m2-flood-alert" class="alert-banner">
+        ALERTA DE INUNDAÇÃO (NÍVEL ≥ 65%): Boia de Emergência fechou contato NA (13-14) e acionou a bomba!
+      </div>
+
+      <div class="sub-tabs" data-mod="m2">
+        <button type="button" class="sub-btn active" data-view="m2-svg-view">🔌 Diagrama com Bornes Numerados</button>
+        <button type="button" class="sub-btn" data-view="m2-table-view">📋 Tabela Borne a Borne (14 Conexões)</button>
+      </div>
+
+      <!-- VISÃO 1: DIAGRAMA SVG DETALHADO -->
+      <div id="m2-svg-view" class="sub-view active">
+        <svg viewBox="0 0 650 385">
+          <text x="15" y="18" class="svg-txt">QGBT 380V TRIFÁSICO (L1 / L2 / L3 + NEUTRO)</text>
+          <path id="w2-l1" d="M 35 25 L 35 55" class="wire-live"/>
+          <path id="w2-l2" d="M 65 25 L 65 55" class="wire-l2"/>
+          <path id="w2-l3" d="M 95 25 L 95 55" class="wire-l3"/>
+          <path d="M 145 25 L 145 355 L 30 355" class="wire-neutral"/>
+          <text x="152" y="42" class="svg-sub">N (Neutro)</text>
+
+          <!-- Disjuntor Motor -->
+          <rect x="18" y="55" width="95" height="52" rx="6" class="comp-box"/>
+          <text x="26" y="75" class="svg-txt">DISJ. MOTOR</text>
+          <text x="34" y="90" class="svg-sub" id="svg-m2-dj">FECHADO</text>
+          <text x="27" y="65" class="svg-pin">1   3   5</text>
+          <text x="27" y="103" class="svg-pin">2   4   6</text>
+
+          <!-- Potência Disjuntor -> Contatora -->
+          <path id="w2-p1" d="M 35 107 L 35 175" class="wire-live"/>
+          <path id="w2-p2" d="M 65 107 L 65 175" class="wire-l2"/>
+          <path id="w2-p3" d="M 95 107 L 95 175" class="wire-l3"/>
+
+          <!-- Contatora Tripolar -->
+          <rect x="15" y="175" width="110" height="68" rx="6" class="comp-box"/>
+          <text x="28" y="196" class="svg-txt">CONTATORA</text>
+          <text x="32" y="212" class="svg-sub" id="svg-m2-cont">ABERTA</text>
+          <text x="23" y="186" class="svg-pin">L1  L2  L3  A1</text>
+          <text x="23" y="238" class="svg-pin">T1  T2  T3  A2</text>
+
+          <!-- Saída T1 T2 T3 -> Bomba Submersa -->
+          <path id="w2-t1" d="M 35 243 L 35 285" class="wire-off"/>
+          <path id="w2-t2" d="M 65 243 L 65 285" class="wire-off"/>
+          <path id="w2-t3" d="M 95 243 L 95 285" class="wire-off"/>
+          <rect x="15" y="285" width="105" height="54" rx="8" class="comp-box"/>
+          <text x="22" y="308" class="svg-txt">BOMBA SUBM.</text>
+          <text x="34" y="324" class="svg-sub" id="svg-m2-pump">PARADA</text>
+          <text x="25" y="296" class="svg-pin">U1  V1  W1</text>
+
+          <!-- Neutro -> A2 da Contatora e Timer -->
+          <path d="M 112 355 L 112 243" class="wire-neutral"/>
+          <text x="117" y="268" class="svg-sub">N → A2</text>
+
+          <!-- Derivação L1, L2, L3 para Relé Falta de Fase -->
+          <path d="M 35 125 L 200 125 L 200 105" class="wire-live"/>
+          <path d="M 65 135 L 230 135 L 230 105" class="wire-l2"/>
+          <path d="M 95 145 L 260 145 L 260 105" class="wire-l3"/>
+
+          <!-- Relé Falta de Fase -->
+          <rect x="180" y="45" width="145" height="60" rx="6" class="comp-box"/>
+          <text x="192" y="64" class="svg-txt">RELÉ FALTA FASE</text>
+          <text x="192" y="80" class="svg-sub" id="svg-m2-rff">OK (15-18 FECHADO)</text>
+          <text x="192" y="99" class="svg-pin">L1  L2  L3   15  18</text>
+
+          <!-- Jumper L1 -> Borne 15 RFF & Saída 18 -> Seletora -->
+          <path id="w2-cmd2" d="M 305 105 L 305 125 L 395 125 L 395 105" class="wire-cmd"/>
+          <text x="312" y="138" class="svg-sub">Borne 18 RFF → Comum (1) Seletora</text>
+
+          <!-- Chave Seletora MAN - 0 - AUT -->
+          <rect x="360" y="45" width="145" height="60" rx="6" class="comp-box"/>
+          <text x="378" y="64" class="svg-txt">CHAVE SELETORA</text>
+          <text x="378" y="80" class="svg-sub" id="svg-m2-sel">AUTOMÁTICO</text>
+          <text x="372" y="99" class="svg-pin">1(Com)  2(MAN)  4(AUT)</text>
+
+          <!-- Saída 4 (AUT) -> Boia 1 (Mínimo) -->
+          <path id="w2-cmd3" d="M 480 105 L 480 155" class="wire-cmd"/>
+          <rect x="425" y="155" width="140" height="55" rx="6" class="comp-box"/>
+          <text x="438" y="174" class="svg-txt">BOIA 1 (MÍNIMO)</text>
+          <text x="438" y="190" class="svg-sub" id="svg-m2-b1">COM ÁGUA (NA FECH.)</text>
+          <text x="438" y="204" class="svg-pin">COM (Azul)   NA (Preto)</text>
+
+          <!-- Boia 1 NA -> Temporizador Cíclico (A1 / 15) -->
+          <path id="w2-cmd4" d="M 520 210 L 520 265 L 375 265" class="wire-cmd"/>
+          <text x="392" y="258" class="svg-sub">NA Boia 1 → Borne A1/15 Timer</text>
+
+          <rect x="215" y="245" width="160" height="62" rx="6" class="comp-box"/>
+          <text x="228" y="264" class="svg-txt">TEMP. CÍCLICO 5m</text>
+          <text x="228" y="280" class="svg-sub" id="svg-m2-tmr">AGUARDANDO: 05:00</text>
+          <text x="225" y="299" class="svg-pin">A1/15    A2(N)    18(Saída)</text>
+
+          <!-- Boia 2 (Alto / Emergência - Bypass direto para A1 Contatora) -->
+          <rect x="465" y="295" width="165" height="58" rx="6" class="comp-box"/>
+          <text x="478" y="314" class="svg-txt">BOIA 2 (NÍVEL ALTO)</text>
+          <text x="478" y="330" class="svg-sub" id="svg-m2-b2">NORMAL (ABERTA)</text>
+          <text x="478" y="345" class="svg-pin">COM (18 RFF)  NA (→ A1)</text>
+          <path id="w2-cmd5" d="M 350 125 L 350 325 L 465 325" class="wire-cmd"/>
+
+          <!-- Retorno Timer 18 / MAN / Boia 2 -> A1 da Contatora -->
+          <path id="w2-a1" d="M 215 275 L 155 275 L 155 190 L 125 190" class="wire-off"/>
+          <text x="132" y="166" class="svg-sub">Retorno → A1</text>
+        </svg>
+      </div>
+
+      <!-- VISÃO 2: TABELA BORNE A BORNE -->
+      <div id="m2-table-view" class="sub-view">
+        <div class="borne-table-wrap">
+          <table class="borne-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Origem (Componente / Borne)</th>
+                <th>Destino (Componente / Borne)</th>
+                <th>Cabo / Cor</th>
+                <th>Função &amp; Estado Atual</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Barramento QGBT <span class="pin-tag">L1 / L2 / L3</span></td>
+                <td>Disjuntor-Motor <span class="pin-tag">Bornes 1 / 3 / 5</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#ef4444;"></span>4,0mm² Potência</span></td>
+                <td>Entrada Trifásica 380V · <span id="bt-m2-1" class="state-live">380V OK</span></td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Disjuntor-Motor <span class="pin-tag">Bornes 2 / 4 / 6</span></td>
+                <td>Contatora Tripolar <span class="pin-tag">Bornes L1 / L2 / L3</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#f97316;"></span>4,0mm² Potência</span></td>
+                <td>Alimentação Força Contatora · <span id="bt-m2-2" class="state-live">380V</span></td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Disjuntor-Motor <span class="pin-tag">2 / 4 / 6</span></td>
+                <td>Relé Falta de Fase <span class="pin-tag">Bornes L1 / L2 / L3</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#eab308;"></span>1,5mm² Sensor</span></td>
+                <td>Monitoramento Fases · <span id="bt-m2-3" class="state-live">Monitorando</span></td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Relé Falta Fase <span class="pin-tag">Borne L1</span></td>
+                <td>Relé Falta Fase <span class="pin-tag">Borne 15 (Comum)</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#ef4444;"></span>1,5mm² Vermelho</span></td>
+                <td>Fase Comando 220V (F+N) · <span id="bt-m2-4" class="state-live">220V</span></td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Relé Falta Fase <span class="pin-tag">Borne 18 (NA)</span></td>
+                <td>Chave Seletora <span class="pin-tag">Borne 1 (Comum)</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#22c55e;"></span>1,5mm² Vermelho</span></td>
+                <td>Liberação Segurança RFF · <span id="bt-m2-5" class="state-live">Fechado</span></td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>Chave Seletora <span class="pin-tag">Borne 2 (MAN)</span></td>
+                <td>Contatora <span class="pin-tag">Borne A1</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#ef4444;"></span>1,5mm² Vermelho</span></td>
+                <td>Partida Direta Manual · <span id="bt-m2-6" class="state-dead">Aberto</span></td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>Chave Seletora <span class="pin-tag">Borne 4 (AUT)</span></td>
+                <td>Boia 1 (Mínimo) <span class="pin-tag">Fio COMUM</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#22c55e;"></span>1,5mm² Preto</span></td>
+                <td>Série Proteção Nível Mín. · <span id="bt-m2-7" class="state-live">Ativo (AUT)</span></td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>Boia 1 (Mínimo) <span class="pin-tag">Contato NA</span></td>
+                <td>Temporizador Cíclico <span class="pin-tag">Bornes A1 + 15</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#22c55e;"></span>1,5mm² Marrom</span></td>
+                <td>Alimenta Timer se Nível ≥22% · <span id="bt-m2-8" class="state-live">Fechado</span></td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td>Temporizador Cíclico <span class="pin-tag">Borne 18 (Saída)</span></td>
+                <td>Contatora <span class="pin-tag">Borne A1</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#22c55e;"></span>1,5mm² Vermelho</span></td>
+                <td>Pulso Drenagem (1 min / 5 min) · <span id="bt-m2-9" class="state-dead">Aguardando</span></td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td>Relé Falta Fase <span class="pin-tag">Borne 18</span></td>
+                <td>Boia 2 (Alto) <span class="pin-tag">Fio COMUM</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#ef4444;"></span>1,5mm² Vermelho</span></td>
+                <td>Alimentação Emergência · <span id="bt-m2-10" class="state-live">Pronto</span></td>
+              </tr>
+              <tr>
+                <td>11</td>
+                <td>Boia 2 (Alto) <span class="pin-tag">Contato NA</span></td>
+                <td>Contatora <span class="pin-tag">Borne A1</span> + Sirene</td>
+                <td><span class="wire-pill"><span class="dot" style="background:#ef4444;"></span>1,5mm² Marrom</span></td>
+                <td>Bypass Nível Alto (≥65%) · <span id="bt-m2-11" class="state-dead">Aberta</span></td>
+              </tr>
+              <tr>
+                <td>12</td>
+                <td>Barramento QGBT <span class="pin-tag">NEUTRO N</span></td>
+                <td>Contatora <span class="pin-tag">A2</span> + Timer <span class="pin-tag">A2</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#3b82f6;"></span>1,5mm² Azul</span></td>
+                <td>Retorno Neutro Bobinas · <span id="bt-m2-12" class="state-live">Conectado</span></td>
+              </tr>
+              <tr>
+                <td>13</td>
+                <td>Contatora Tripolar <span class="pin-tag">Bornes T1 / T2 / T3</span></td>
+                <td>Bomba Submersa <span class="pin-tag">Cabos U1 / V1 / W1</span></td>
+                <td><span class="wire-pill"><span class="dot" style="background:#ef4444;"></span>Cabo PP 4x4mm²</span></td>
+                <td>Saída Potência Motor 380V · <span id="bt-m2-13" class="state-dead">0V (Parada)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="controls-grid">
+        <div class="ctrl-card">
+          <label>Disjuntor-Motor Tripolar</label>
+          <button type="button" id="btn-m2-dj" class="btn btn-full btn-green">LIGADO (ON)</button>
+        </div>
+        <div class="ctrl-card">
+          <label>Chave Seletora de Comando</label>
+          <div class="sel-group">
+            <button type="button" id="sel-man">MAN</button>
+            <button type="button" id="sel-0">0</button>
+            <button type="button" id="sel-aut" class="active">AUT</button>
+          </div>
+        </div>
+        <div class="ctrl-card">
+          <label>Simulação Temporizador (5 min)</label>
+          <div class="sel-group">
+            <button type="button" id="spd-1" class="active">1x</button>
+            <button type="button" id="spd-10">10x</button>
+            <button type="button" id="spd-60">60x</button>
+            <button type="button" id="btn-skip" class="btn-blue">Pular</button>
+          </div>
+        </div>
+        <div class="ctrl-card">
+          <label>Injeção de Falhas (Treinamento)</label>
+          <div class="sel-group">
+            <button type="button" id="btn-f-l2" class="btn-slate">Falta L2</button>
+            <button type="button" id="btn-f-seq" class="btn-slate">Inv. Fase</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <small style="color:var(--muted); font-weight:700; display:block; margin-bottom:6px;">CENÁRIOS GUIADOS DE TREINAMENTO:</small>
+        <div class="scenario-btns">
+          <button type="button" id="sc-dry" class="btn btn-slate">1. Poço Seco (Proteção Boia 1)</button>
+          <button type="button" id="sc-cycle" class="btn btn-slate">2. Ciclo Normal 5 min + Drenagem</button>
+          <button type="button" id="sc-flood" class="btn btn-amber">3. Chuva Forte / Nível Alto (Boia 2)</button>
+          <button type="button" id="sc-phase" class="btn btn-red">4. Queda de Fase L2 no QGBT</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">
+        <span>Poço da Mina (Subsolo) &amp; Telemetria</span>
+        <span id="m2-lvl-txt" class="badge badge-on">Nível Poço: 40%</span>
+      </div>
+
+      <div class="sim-stage">
+        <div class="tank-wrap">
+          <div class="tank" style="border-color:#94a3b8;">
+            <div class="float-line" style="bottom: 65%; color:#fca5a5;">65% Boia 2 (Emergência)</div>
+            <div class="float-line" style="bottom: 22%; color:#fde047;">22% Boia 1 (Nível Mín.)</div>
+            <div id="m2-water" class="water" style="height: 40%;"></div>
+            <div id="m2-b2-icon" class="boia-icon" style="bottom: 62%; background:#ef4444; color:#fff;">B2</div>
+            <div id="m2-b1-icon" class="boia-icon" style="bottom: 19%; left:14px; right:auto;">B1</div>
+          </div>
+          <small style="margin-top:8px; color:var(--muted);">Poço do Lençol Freático</small>
+        </div>
+
+        <div class="pump-box">
+          <strong style="font-size:0.95rem;">Bomba Submersa 380V 3Ø</strong>
+          <div id="m2-rotor" class="rotor">380V</div>
+          <div id="m2-pump-state" style="font-size:0.85rem; color:var(--muted); font-weight:700;">AGUARDANDO CICLO</div>
+          <div style="margin-top:8px; font-size:0.8rem; color:var(--accent);" id="m2-timer-display">Próx. ciclo: 05:00</div>
+          <div style="margin-top:8px;">
+            <label style="font-size:0.75rem; color:var(--muted);">Vazão Mina (Enchimento):</label>
+            <input type="range" id="m2-inflow" min="0" max="6" step="0.5" value="1">
+          </div>
+        </div>
+      </div>
+
+      <ul class="diag-list">
+        <li><span>Relé Falta Fase (15 → 18):</span><strong id="d-m2-rff">Normal (L1-L2-L3 OK)</strong></li>
+        <li><span>Boia 1 (COM → NA → Timer A1):</span><strong id="d-m2-b1">Fechada (Nível ≥ 22%)</strong></li>
+        <li><span>Boia 2 (COM → NA → Contatora A1):</span><strong id="d-m2-b2">Aberta (Nível &lt; 65%)</strong></li>
+        <li><span>Temporizador (15 → 18 → Contatora A1):</span><strong id="d-m2-tmr">Contando Intervalo (5 min)</strong></li>
+        <li><span>Contatora Tripolar (A1 - A2):</span><strong id="d-m2-cont">Desenergizada (0 V)</strong></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ================= MÓDULO ESTÚDIO: COLAR NOVO CÓDIGO ================= -->
+  <section id="studio" class="module single-col">
+    <div class="studio-grid">
+      <div class="panel">
+        <div class="panel-title">
+          <span>Adicionar ou Editar Módulo (Cole o Código Aqui)</span>
+          <span class="badge badge-warn">ESTÚDIO RÁPIDO</span>
+        </div>
+
+        <p style="font-size:0.85rem; color:var(--muted); line-height:1.45;">
+          Peça um novo simulador aqui no chat, copie o código gerado e <strong>cole na caixa abaixo</strong>. Ele aparecerá imediatamente como uma nova aba no topo do laboratório!
+        </p>
+
+        <input type="hidden" id="edit-proj-id" value="">
+
+        <div class="form-group">
+          <label for="proj-title">Nome da Aba / Projeto (ex.: 3. Partida Estrela-Triângulo)</label>
+          <input type="text" id="proj-title" placeholder="Digite o nome do projeto...">
+        </div>
+
+        <div class="form-group">
+          <label for="proj-code">Cole aqui o novo código HTML completo:</label>
+          <textarea id="proj-code" placeholder="Cole aqui todo o código HTML do novo módulo..."></textarea>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" id="btn-save-proj" class="btn btn-green" style="flex:1;">Salvar e Abrir Aba no Site</button>
+          <button type="button" id="btn-clear-proj" class="btn btn-slate">Limpar Campos</button>
+        </div>
+
+        <div id="studio-msg" class="status-msg"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">
+          <span>Projetos Criados neste Site</span>
+          <button type="button" id="btn-download-site" class="btn btn-blue" style="padding:5px 10px; font-size:0.78rem;">Baixar Site Completo (index.html)</button>
+        </div>
+
+        <div id="custom-projects-list">
+          <p style="font-size:0.85rem; color:var(--muted);">Nenhum módulo extra criado ainda. Use a caixa ao lado para colar seu primeiro código.</p>
+        </div>
+
+        <div style="border-top:1px solid var(--border); padding-top:14px; margin-top:auto;">
+          <strong style="font-size:0.9rem; color:var(--accent); display:block; margin-bottom:6px;">
+            Publicação Automática no GitHub / Cloudflare (Opcional)
+          </strong>
+          <p style="font-size:0.8rem; color:var(--muted); margin-bottom:10px; line-height:1.4;">
+            Para que todos da equipe vejam os novos projetos no link público, você pode baixar o <code>index.html</code> atualizado acima e subir no GitHub, <strong>ou</strong> colar seu Token do GitHub abaixo para publicar com 1 clique:
+          </p>
+
+          <div class="form-group">
+            <label for="gh-token">GitHub Personal Access Token (salvo apenas neste navegador):</label>
+            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+          </div>
+
+          <button type="button" id="btn-publish-gh" class="btn btn-amber btn-full">Publicar Alterações Direto no GitHub</button>
+          <div id="gh-msg" class="status-msg"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Vivenzo Savassi &amp; Gran Vivenzo · Manutenção Predial · Desenvolvido por Eduardo Oliveira
+</footer>
+
+<script id="custom-data-script">
+  window.EMBEDDED_PROJECTS = [];
+</script>
+
+<script>
+(function() {
+  const STORAGE_KEY = 'vivenzo_lab_custom_projects_v2';
+  const GH_TOKEN_KEY = 'vivenzo_gh_token_v1';
+  const GH_OWNER = 'edu00711811-oss';
+  const GH_REPO = 'vivenzo-laboratorio-automacoes';
+  const GH_PATH = 'index.html';
+
+  function loadProjects() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {}
+    if (Array.isArray(window.EMBEDDED_PROJECTS)) {
+      return window.EMBEDDED_PROJECTS;
+    }
+    return [];
+  }
+
+  let customProjects = loadProjects();
+
+  function switchTab(id) {
+    document.querySelectorAll('.module').forEach(function(m) {
+      m.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+      b.classList.remove('active');
+    });
+    const targetSec = document.getElementById(id);
+    if (targetSec) targetSec.classList.add('active');
+    const targetBtn = document.querySelector('.tab-btn[data-target="' + id + '"]');
+    if (targetBtn) targetBtn.classList.add('active');
+  }
+
+  document.getElementById('main-tabs').addEventListener('click', function(e) {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    const target = btn.getAttribute('data-target');
+    if (target) switchTab(target);
+  });
+
+  // Sub-tabs (Diagrama vs Tabela Borne a Borne)
+  document.querySelectorAll('.sub-tabs').forEach(function(bar) {
+    bar.addEventListener('click', function(e) {
+      const btn = e.target.closest('.sub-btn');
+      if (!btn) return;
+      const viewId = btn.getAttribute('data-view');
+      const parentPanel = bar.parentElement;
+      bar.querySelectorAll('.sub-btn').forEach(function(b) { b.classList.remove('active'); });
+      parentPanel.querySelectorAll('.sub-view').forEach(function(v) { v.classList.remove('active'); });
+      btn.classList.add('active');
+      const targetView = document.getElementById(viewId);
+      if (targetView) targetView.classList.add('active');
+    });
+  });
+
+  function showStatus(elId, text, isOk) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'status-msg ' + (isOk ? 'ok' : 'err');
+  }
+
+  function persistProjects() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(customProjects));
+    } catch (e) {}
+    renderCustomModules();
+  }
+
+  function clearEditor() {
+    document.getElementById('edit-proj-id').value = '';
+    document.getElementById('proj-title').value = '';
+    document.getElementById('proj-code').value = '';
+  }
+
+  function saveCustomProject() {
+    const title = document.getElementById('proj-title').value.trim();
+    const code = document.getElementById('proj-code').value.trim();
+    const editId = document.getElementById('edit-proj-id').value;
+
+    if (!title || !code) {
+      showStatus('studio-msg', 'Preencha o nome do projeto e cole o código HTML antes de salvar.', false);
+      return;
+    }
+
+    let targetId = editId;
+    if (editId) {
+      const idx = customProjects.findIndex(function(p) { return p.id === editId; });
+      if (idx !== -1) {
+        customProjects[idx].title = title;
+        customProjects[idx].code = code;
+      }
+    } else {
+      targetId = 'custom_' + Date.now();
+      customProjects.push({ id: targetId, title: title, code: code });
+    }
+
+    persistProjects();
+    clearEditor();
+    showStatus('studio-msg', 'Projeto "' + title + '" salvo e ativado na barra superior!', true);
+    switchTab(targetId);
+  }
+
+  function editProject(id) {
+    const proj = customProjects.find(function(p) { return p.id === id; });
+    if (!proj) return;
+    document.getElementById('edit-proj-id').value = proj.id;
+    document.getElementById('proj-title').value = proj.title;
+    document.getElementById('proj-code').value = proj.code;
+    switchTab('studio');
+    showStatus('studio-msg', 'Editando "' + proj.title + '". Cole o novo código e clique em Salvar.', true);
+  }
+
+  function deleteProject(id) {
+    const proj = customProjects.find(function(p) { return p.id === id; });
+    if (!proj) return;
+    if (!confirm('Remover o projeto "' + proj.title + '"?')) return;
+    customProjects = customProjects.filter(function(p) { return p.id !== id; });
+    persistProjects();
+    switchTab('studio');
+    showStatus('studio-msg', 'Projeto "' + proj.title + '" removido.', true);
+  }
+
+  function renderCustomModules() {
+    const tabsBar = document.getElementById('main-tabs');
+    const studioBtn = document.getElementById('btn-open-studio');
+    const container = document.getElementById('main-container');
+    const listBox = document.getElementById('custom-projects-list');
+
+    tabsBar.querySelectorAll('.custom-tab').forEach(function(el) { el.remove(); });
+    container.querySelectorAll('.custom-section').forEach(function(el) { el.remove(); });
+
+    if (customProjects.length === 0) {
+      listBox.innerHTML = '<p style="font-size:0.85rem; color:var(--muted);">Nenhum módulo extra criado ainda. Use a caixa ao lado para colar seu primeiro código.</p>';
+      return;
+    }
+
+    listBox.innerHTML = '';
+
+    customProjects.forEach(function(proj) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tab-btn custom-tab';
+      btn.setAttribute('data-target', proj.id);
+      btn.textContent = proj.title;
+      tabsBar.insertBefore(btn, studioBtn);
+
+      const sec = document.createElement('section');
+      sec.id = proj.id;
+      sec.className = 'module single-col custom-section';
+
+      const panel = document.createElement('div');
+      panel.className = 'panel';
+      panel.style.padding = '12px';
+
+      const pTitle = document.createElement('div');
+      pTitle.className = 'panel-title';
+
+      const spanTitle = document.createElement('span');
+      spanTitle.textContent = proj.title;
+
+      const btnGroup = document.createElement('div');
+      btnGroup.style.display = 'flex';
+      btnGroup.style.gap = '8px';
+
+      const bEdit = document.createElement('button');
+      bEdit.type = 'button';
+      bEdit.className = 'btn btn-amber';
+      bEdit.style.padding = '5px 10px';
+      bEdit.style.fontSize = '0.78rem';
+      bEdit.textContent = 'Editar Código';
+      bEdit.addEventListener('click', function() { editProject(proj.id); });
+
+      const bDel = document.createElement('button');
+      bDel.type = 'button';
+      bDel.className = 'btn btn-red';
+      bDel.style.padding = '5px 10px';
+      bDel.style.fontSize = '0.78rem';
+      bDel.textContent = 'Excluir';
+      bDel.addEventListener('click', function() { deleteProject(proj.id); });
+
+      btnGroup.appendChild(bEdit);
+      btnGroup.appendChild(bDel);
+      pTitle.appendChild(spanTitle);
+      pTitle.appendChild(btnGroup);
+
+      const iframe = document.createElement('iframe');
+      iframe.className = 'custom-iframe';
+      iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-modals');
+      iframe.srcdoc = proj.code;
+
+      panel.appendChild(pTitle);
+      panel.appendChild(iframe);
+      sec.appendChild(panel);
+      container.appendChild(sec);
+
+      const item = document.createElement('div');
+      item.className = 'project-item';
+
+      const info = document.createElement('div');
+      const strong = document.createElement('strong');
+      strong.style.fontSize = '0.9rem';
+      strong.style.display = 'block';
+      strong.textContent = proj.title;
+      const small = document.createElement('small');
+      small.style.color = 'var(--muted)';
+      small.textContent = 'Tamanho: ' + (proj.code.length / 1024).toFixed(1) + ' KB';
+      info.appendChild(strong);
+      info.appendChild(small);
+
+      const actions = document.createElement('div');
+      actions.style.display = 'flex';
+      actions.style.gap = '6px';
+
+      const aOpen = document.createElement('button');
+      aOpen.type = 'button';
+      aOpen.className = 'btn btn-blue';
+      aOpen.style.padding = '6px 10px';
+      aOpen.style.fontSize = '0.78rem';
+      aOpen.textContent = 'Abrir';
+      aOpen.addEventListener('click', function() { switchTab(proj.id); });
+
+      const aEdit = document.createElement('button');
+      aEdit.type = 'button';
+      aEdit.className = 'btn btn-amber';
+      aEdit.style.padding = '6px 10px';
+      aEdit.style.fontSize = '0.78rem';
+      aEdit.textContent = 'Editar';
+      aEdit.addEventListener('click', function() { editProject(proj.id); });
+
+      const aDel = document.createElement('button');
+      aDel.type = 'button';
+      aDel.className = 'btn btn-red';
+      aDel.style.padding = '6px 10px';
+      aDel.style.fontSize = '0.78rem';
+      aDel.textContent = 'Excluir';
+      aDel.addEventListener('click', function() { deleteProject(proj.id); });
+
+      actions.appendChild(aOpen);
+      actions.appendChild(aEdit);
+      actions.appendChild(aDel);
+
+      item.appendChild(info);
+      item.appendChild(actions);
+      listBox.appendChild(item);
+    });
+  }
+
+  function buildExportableHTML() {
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelectorAll('.custom-tab, .custom-section').forEach(function(el) { el.remove(); });
+    clone.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    const firstTab = clone.querySelector('.tab-btn[data-target="mod1"]');
+    if (firstTab) firstTab.classList.add('active');
+    clone.querySelectorAll('.module').forEach(function(m) { m.classList.remove('active'); });
+    const firstMod = clone.querySelector('#mod1');
+    if (firstMod) firstMod.classList.add('active');
+
+    const dataScript = clone.querySelector('#custom-data-script');
+    if (dataScript) {
+      dataScript.textContent = '\n  window.EMBEDDED_PROJECTS = ' + JSON.stringify(customProjects) + ';\n';
+    }
+    return '<!DOCTYPE html>\n' + clone.outerHTML;
+  }
+
+  function downloadFullSiteHTML() {
+    const htmlStr = buildExportableHTML();
+    const blob = new Blob([htmlStr], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'index.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showStatus('gh-msg', 'Arquivo index.html completo baixado! Basta substituir no GitHub para tornar permanente.', true);
+  }
+
+  async function publishToGitHub() {
+    const token = document.getElementById('gh-token').value.trim();
+    if (!token) {
+      showStatus('gh-msg', 'Cole seu GitHub Personal Access Token acima para publicar direto.', false);
+      return;
+    }
+    try { localStorage.setItem(GH_TOKEN_KEY, token); } catch (e) {}
+    showStatus('gh-msg', 'Enviando atualização para o GitHub...', true);
+
+    try {
+      const apiUrl = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_PATH;
+      const headers = {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      };
+
+      let sha = null;
+      const getRes = await fetch(apiUrl, { headers: headers });
+      if (getRes.ok) {
+        const data = await getRes.json();
+        sha = data.sha;
+      }
+
+      const fullHTML = buildExportableHTML();
+      const base64Content = btoa(unescape(encodeURIComponent(fullHTML)));
+
+      const body = {
+        message: 'Atualização via Vivenzo Estúdio de Automações',
+        content: base64Content
+      };
+      if (sha) body.sha = sha;
+
+      const putRes = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: headers,
+        body: JSON.stringify(body)
+      });
+
+      if (!putRes.ok) {
+        const errData = await putRes.json();
+        throw new Error(errData.message || 'Erro ao autenticar no GitHub.');
+      }
+
+      showStatus('gh-msg', 'Publicado no GitHub com sucesso! A Cloudflare atualizará o link público em ~30 segundos.', true);
+    } catch (err) {
+      showStatus('gh-msg', 'Falha ao publicar: ' + err.message, false);
+    }
+  }
+
+  document.getElementById('btn-save-proj').addEventListener('click', saveCustomProject);
+  document.getElementById('btn-clear-proj').addEventListener('click', clearEditor);
+  document.getElementById('btn-download-site').addEventListener('click', downloadFullSiteHTML);
+  document.getElementById('btn-publish-gh').addEventListener('click', publishToGitHub);
+
+  function setTableState(id, isLive, liveText, deadText) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = isLive ? liveText : deadText;
+    el.className = isLive ? 'state-live' : 'state-dead';
+  }
+
+  // ================= MÓDULO 1 =================
+  let m1 = { dj: true, level: 25, boiaClosed: true };
+
+  function updateM1() {
+    if (m1.level <= 30) m1.boiaClosed = true;
+    else if (m1.level >= 85) m1.boiaClosed = false;
+
+    const pumpOn = m1.dj && m1.boiaClosed;
+    document.getElementById('m1-water').style.height = m1.level + '%';
+    document.getElementById('m1-lvl-txt').textContent = 'Nível: ' + Math.round(m1.level) + '%';
+
+    const boiaIcon = document.getElementById('m1-boia-icon');
+    boiaIcon.style.bottom = Math.min(88, Math.max(8, m1.level - 3)) + '%';
+    boiaIcon.style.transform = m1.boiaClosed ? 'rotate(35deg)' : 'rotate(-35deg)';
+    boiaIcon.textContent = m1.boiaClosed ? 'NF' : 'NA';
+
+    const rotor = document.getElementById('m1-rotor');
+    const pState = document.getElementById('m1-pump-state');
+    const badge = document.getElementById('m1-status-badge');
+
+    if (!m1.dj) {
+      badge.textContent = 'DISJUNTOR DESLIGADO'; badge.className = 'badge badge-off';
+    } else if (pumpOn) {
+      badge.textContent = 'ABASTECENDO RESERVATÓRIO'; badge.className = 'badge badge-on';
+    } else {
+      badge.textContent = 'CAIXA CHEIA · EM ESPERA'; badge.className = 'badge badge-warn';
+    }
+
+    if (pumpOn) {
+      rotor.classList.add('spinning');
+      pState.textContent = 'EM OPERAÇÃO (220V)'; pState.style.color = 'var(--green)';
+    } else {
+      rotor.classList.remove('spinning');
+      pState.textContent = 'DESLIGADA'; pState.style.color = 'var(--muted)';
+    }
+
+    document.getElementById('svg-m1-dj').textContent = m1.dj ? 'FECHADO (ON)' : 'ABERTO (OFF)';
+    document.getElementById('svg-m1-cont').textContent = pumpOn ? 'ATRACADA' : 'DESARMADA';
+    document.getElementById('svg-m1-pump').textContent = pumpOn ? 'BOMBANDO' : 'PARADA';
+    document.getElementById('svg-m1-boia').textContent = m1.boiaClosed ? 'NF (PEDINDO ÁGUA)' : 'ABERTA (CHEIA)';
+
+    document.getElementById('w-m1-l1').setAttribute('class', m1.dj ? 'wire-live' : 'wire-off');
+    document.getElementById('w-m1-a1').setAttribute('class', m1.dj ? 'wire-live' : 'wire-off');
+    document.getElementById('w-m1-t1').setAttribute('class', pumpOn ? 'wire-live' : 'wire-off');
+    document.getElementById('w-m1-t2').setAttribute('class', pumpOn ? 'wire-neutral' : 'wire-off');
+    document.getElementById('w-m1-boia-out').setAttribute('class', (m1.dj && m1.boiaClosed) ? 'wire-cmd' : 'wire-off');
+
+    document.getElementById('d-m1-l12').textContent = m1.dj ? '220 V' : '0 V (Disjuntor Aberto)';
+    document.getElementById('d-m1-coil').textContent = pumpOn ? '220 V (Energizada)' : '0 V (Desenergizada)';
+    document.getElementById('d-m1-boia').textContent = m1.boiaClosed ? 'Fechado (Nível ≤ 30%)' : 'Aberto (Nível ≥ 85%)';
+    document.getElementById('d-m1-t12').textContent = pumpOn ? '220 V (Bomba Ligada)' : '0 V (Bomba Parada)';
+
+    // Atualiza tabela Borne a Borne M1
+    setTableState('bt-m1-3', m1.dj, '220V Energizado', '0V (DJ Aberto)');
+    setTableState('bt-m1-4', m1.dj, 'Neutro Conectado', 'Interrompido');
+    setTableState('bt-m1-5', m1.dj, '220V em A1', '0V');
+    setTableState('bt-m1-6', m1.dj, 'Neutro na Boia', 'Interrompido');
+    setTableState('bt-m1-7', m1.boiaClosed, 'Fechado (Passa N)', 'Aberto (Caixa Cheia)');
+    setTableState('bt-m1-8', pumpOn, '220V (Bomba ON)', '0V (Bomba OFF)');
+    setTableState('bt-m1-9', pumpOn, 'Fechado (Bomba ON)', 'Aberto (Bomba OFF)');
+  }
+
+  document.getElementById('btn-m1-dj').addEventListener('click', function() {
+    m1.dj = !m1.dj;
+    this.textContent = m1.dj ? 'LIGADO (ON)' : 'DESLIGADO (OFF)';
+    this.className = m1.dj ? 'btn btn-full btn-green' : 'btn btn-full btn-red';
+    updateM1();
+  });
+  document.getElementById('btn-m1-20').addEventListener('click', function() { m1.level = 20; m1.boiaClosed = true; updateM1(); });
+  document.getElementById('btn-m1-90').addEventListener('click', function() { m1.level = 90; m1.boiaClosed = false; updateM1(); });
+
+  // ================= MÓDULO 2 =================
+  let m2 = {
+    dj: true, mode: 'AUT', level: 40, faultL2: false, faultSeq: false,
+    speed: 1, timerState: 'OFF', timerSec: 300, pumpOn: false
+  };
+
+  function setM2Mode(mode) {
+    m2.mode = mode;
+    ['MAN', '0', 'AUT'].forEach(function(m) {
+      document.getElementById('sel-' + m.toLowerCase()).classList.toggle('active', m === mode);
+    });
+    updateM2();
+  }
+
+  function setSpeed(spd) {
+    m2.speed = spd;
+    [1, 10, 60].forEach(function(s) {
+      document.getElementById('spd-' + s).classList.toggle('active', s === spd);
+    });
+  }
+
+  function runScenario(type) {
+    m2.dj = true;
+    const btnDj = document.getElementById('btn-m2-dj');
+    btnDj.textContent = 'LIGADO (ON)';
+    btnDj.className = 'btn btn-full btn-green';
+    m2.faultL2 = false; m2.faultSeq = false;
+    document.getElementById('btn-f-l2').className = 'btn-slate';
+    document.getElementById('btn-f-seq').className = 'btn-slate';
+    setM2Mode('AUT');
+
+    if (type === 'dry') { m2.level = 15; m2.timerState = 'ON'; m2.timerSec = 60; }
+    else if (type === 'cycle') { m2.level = 45; m2.timerState = 'ON'; m2.timerSec = 60; setSpeed(10); }
+    else if (type === 'flood') { m2.level = 72; m2.timerState = 'OFF'; m2.timerSec = 240; }
+    else if (type === 'phase') { m2.level = 50; m2.faultL2 = true; document.getElementById('btn-f-l2').className = 'btn-red'; }
+    updateM2();
+  }
+
+  function fmtTime(sec) {
+    const s = Math.max(0, Math.ceil(sec));
+    return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  function updateM2() {
+    const rffOk = m2.dj && !m2.faultL2 && !m2.faultSeq;
+    const boia1Closed = m2.level >= 22;
+    const boia2Closed = m2.level >= 65;
+
+    let cmdActive = false;
+    if (rffOk) {
+      if (m2.mode === 'MAN') cmdActive = true;
+      else if (m2.mode === 'AUT') {
+        if (boia2Closed) cmdActive = true;
+        else if (boia1Closed && m2.timerState === 'ON') cmdActive = true;
+      }
+    }
+
+    m2.pumpOn = cmdActive;
+    document.getElementById('m2-water').style.height = m2.level + '%';
+    document.getElementById('m2-lvl-txt').textContent = 'Nível Poço: ' + Math.round(m2.level) + '%';
+    document.getElementById('m2-flood-alert').classList.toggle('show', boia2Closed);
+
+    const badge = document.getElementById('m2-status-badge');
+    if (!m2.dj) { badge.textContent = 'DISJUNTOR DESLIGADO'; badge.className = 'badge badge-off'; }
+    else if (!rffOk) {
+      badge.textContent = m2.faultL2 ? 'FALHA: FALTA DE FASE L2' : 'FALHA: SEQUÊNCIA DE FASE';
+      badge.className = 'badge badge-off';
+    } else if (boia2Closed) { badge.textContent = 'EMERGÊNCIA NÍVEL ALTO!'; badge.className = 'badge badge-off'; }
+    else if (!boia1Closed) { badge.textContent = 'BLOQUEIO: POÇO SECO (<22%)'; badge.className = 'badge badge-warn'; }
+    else if (m2.pumpOn) { badge.textContent = 'DRENANDO POÇO (380V)'; badge.className = 'badge badge-on'; }
+    else { badge.textContent = 'EM ESPERA (CICLO 5 MIN)'; badge.className = 'badge badge-on'; }
+
+    const rotor = document.getElementById('m2-rotor');
+    const pState = document.getElementById('m2-pump-state');
+    if (m2.pumpOn) {
+      rotor.classList.add('spinning');
+      pState.textContent = 'DRENANDO (380V 3Ø)'; pState.style.color = 'var(--green)';
+    } else {
+      rotor.classList.remove('spinning');
+      pState.textContent = 'PARADA'; pState.style.color = 'var(--muted)';
+    }
+
+    document.getElementById('m2-timer-display').textContent = m2.timerState === 'OFF'
+      ? 'Próx. ciclo: ' + fmtTime(m2.timerSec)
+      : 'Drenando ciclo: ' + fmtTime(m2.timerSec);
+
+    document.getElementById('svg-m2-dj').textContent = m2.dj ? 'FECHADO' : 'ABERTO';
+    document.getElementById('svg-m2-cont').textContent = m2.pumpOn ? 'ATRACADA' : 'ABERTA';
+    document.getElementById('svg-m2-pump').textContent = m2.pumpOn ? 'DRENANDO' : 'PARADA';
+    document.getElementById('svg-m2-rff').textContent = rffOk ? 'OK (15-18 FECH.)' : 'BLOQUEADO (ABERTO)';
+    document.getElementById('svg-m2-sel').textContent = m2.mode === 'MAN' ? 'MANUAL' : (m2.mode === '0' ? 'DESLIGADO (0)' : 'AUTOMÁTICO');
+    document.getElementById('svg-m2-b1').textContent = boia1Closed ? 'COM ÁGUA (FECH.)' : 'SECO (ABERTA)';
+    document.getElementById('svg-m2-b2').textContent = boia2Closed ? 'EMERGÊNCIA (FECH.)' : 'NORMAL (ABERTA)';
+    document.getElementById('svg-m2-tmr').textContent = m2.timerState === 'OFF' ? 'ESPERA: ' + fmtTime(m2.timerSec) : 'ATIVO: ' + fmtTime(m2.timerSec);
+
+    document.getElementById('w2-l2').setAttribute('class', m2.faultL2 ? 'wire-off' : 'wire-l2');
+    document.getElementById('w2-p2').setAttribute('class', (m2.dj && !m2.faultL2) ? 'wire-l2' : 'wire-off');
+    document.getElementById('w2-p1').setAttribute('class', m2.dj ? 'wire-live' : 'wire-off');
+    document.getElementById('w2-p3').setAttribute('class', m2.dj ? 'wire-l3' : 'wire-off');
+    ['w2-t1', 'w2-t2', 'w2-t3'].forEach(function(id, idx) {
+      const cls = ['wire-live', 'wire-l2', 'wire-l3'][idx];
+      document.getElementById(id).setAttribute('class', m2.pumpOn ? cls : 'wire-off');
+    });
+    document.getElementById('w2-a1').setAttribute('class', m2.pumpOn ? 'wire-cmd' : 'wire-off');
+
+    document.getElementById('d-m2-rff').textContent = rffOk ? 'OK (Contato 15-18 Fechado)' : (m2.faultL2 ? 'DESARMADO — Falta Fase L2!' : 'DESARMADO — Sequência Invertida!');
+    document.getElementById('d-m2-b1').textContent = boia1Closed ? 'Fechada (Nível ≥ 22%)' : 'Aberta (Proteção Trabalho a Seco)';
+    document.getElementById('d-m2-b2').textContent = boia2Closed ? 'FECHADA — Partida Forçada + Alarme!' : 'Aberta (Nível < 65%)';
+    document.getElementById('d-m2-tmr').textContent = m2.timerState === 'OFF' ? 'Intervalo 5 min (' + fmtTime(m2.timerSec) + ')' : 'Pulso Drenagem (' + fmtTime(m2.timerSec) + ')';
+    document.getElementById('d-m2-cont').textContent = m2.pumpOn ? '220V (Bobina Atracada)' : '0V (Desenergizada)';
+
+    // Atualiza tabela Borne a Borne M2
+    setTableState('bt-m2-1', !m2.faultL2, '380V L1-L2-L3 OK', 'FALTA FASE L2!');
+    setTableState('bt-m2-2', m2.dj && !m2.faultL2, '380V nos bornes L', 'Interrompido');
+    setTableState('bt-m2-3', rffOk, 'Fases e Sequência OK', 'FALHA DETECTADA');
+    setTableState('bt-m2-4', m2.dj, '220V no Borne 15', '0V');
+    setTableState('bt-m2-5', rffOk, '15→18 Fechado (220V)', '15→18 Aberto');
+    setTableState('bt-m2-6', rffOk && m2.mode === 'MAN', 'Fechado (MAN Ativo)', 'Aberto');
+    setTableState('bt-m2-7', rffOk && m2.mode === 'AUT', 'Fechado (AUT Ativo)', 'Aberto');
+    setTableState('bt-m2-8', rffOk && m2.mode === 'AUT' && boia1Closed, 'Fechada (Nível ≥22%)', 'Aberta (Poço Seco)');
+    setTableState('bt-m2-9', rffOk && m2.mode === 'AUT' && boia1Closed && m2.timerState === 'ON', '15→18 Ativo (Drenando)', 'Aguardando Ciclo');
+    setTableState('bt-m2-10', rffOk, '220V no Comum Boia 2', '0V');
+    setTableState('bt-m2-11', rffOk && boia2Closed, 'FECHADA (Emergência!)', 'Aberta (<65%)');
+    setTableState('bt-m2-13', m2.pumpOn, '380V 3Ø (Bomba ON)', '0V (Bomba OFF)');
+  }
+
+  document.getElementById('btn-m2-dj').addEventListener('click', function() {
+    m2.dj = !m2.dj;
+    this.textContent = m2.dj ? 'LIGADO (ON)' : 'DESLIGADO (OFF)';
+    this.className = m2.dj ? 'btn btn-full btn-green' : 'btn btn-full btn-red';
+    updateM2();
+  });
+  document.getElementById('sel-man').addEventListener('click', function() { setM2Mode('MAN'); });
+  document.getElementById('sel-0').addEventListener('click', function() { setM2Mode('0'); });
+  document.getElementById('sel-aut').addEventListener('click', function() { setM2Mode('AUT'); });
+  document.getElementById('spd-1').addEventListener('click', function() { setSpeed(1); });
+  document.getElementById('spd-10').addEventListener('click', function() { setSpeed(10); });
+  document.getElementById('spd-60').addEventListener('click', function() { setSpeed(60); });
+  document.getElementById('btn-skip').addEventListener('click', function() { m2.timerSec = 1; });
+  document.getElementById('btn-f-l2').addEventListener('click', function() {
+    m2.faultL2 = !m2.faultL2;
+    this.className = m2.faultL2 ? 'btn-red' : 'btn-slate';
+    updateM2();
+  });
+  document.getElementById('btn-f-seq').addEventListener('click', function() {
+    m2.faultSeq = !m2.faultSeq;
+    this.className = m2.faultSeq ? 'btn-amber' : 'btn-slate';
+    updateM2();
+  });
+  document.getElementById('sc-dry').addEventListener('click', function() { runScenario('dry'); });
+  document.getElementById('sc-cycle').addEventListener('click', function() { runScenario('cycle'); });
+  document.getElementById('sc-flood').addEventListener('click', function() { runScenario('flood'); });
+  document.getElementById('sc-phase').addEventListener('click', function() { runScenario('phase'); });
+
+  setInterval(function() {
+    const drain1 = parseFloat(document.getElementById('m1-drain').value) * 0.25;
+    m1.level = Math.max(0, m1.level - drain1);
+    if (m1.dj && m1.boiaClosed) m1.level = Math.min(100, m1.level + 1.8);
+    updateM1();
+
+    const inflow2 = parseFloat(document.getElementById('m2-inflow').value) * 0.25;
+    m2.level = Math.min(100, m2.level + inflow2);
+    if (m2.pumpOn) m2.level = Math.max(0, m2.level - 2.2);
+
+    const rffOk = m2.dj && !m2.faultL2 && !m2.faultSeq;
+    const boia1Closed = m2.level >= 22;
+    if (rffOk && m2.mode === 'AUT' && boia1Closed) {
+      m2.timerSec -= 0.25 * m2.speed;
+      if (m2.timerSec <= 0) {
+        if (m2.timerState === 'OFF') { m2.timerState = 'ON'; m2.timerSec = 60; }
+        else { m2.timerState = 'OFF'; m2.timerSec = 300; }
+      }
+    } else if (!boia1Closed && m2.timerState === 'ON') {
+      m2.timerState = 'OFF'; m2.timerSec = 300;
+    }
+    updateM2();
+  }, 250);
+
+  try {
+    const savedToken = localStorage.getItem(GH_TOKEN_KEY);
+    if (savedToken) document.getElementById('gh-token').value = savedToken;
+  } catch (e) {}
+  renderCustomModules();
+  updateM1();
+  updateM2();
+})();
+</script>
+</body>
+</html>
