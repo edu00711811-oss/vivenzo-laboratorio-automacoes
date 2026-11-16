@@ -86,7 +86,6 @@
   .btn-slate { background: #334155; color: #f8fafc; }
   .btn:hover:not(:disabled) { opacity: 0.92; }
 
-  /* BANCADA INTERATIVA & MODO PROVA */
   .mode-switch {
     display: flex; gap: 4px; background: #090d16; padding: 4px; border-radius: 8px; border: 1px solid var(--border);
   }
@@ -115,7 +114,7 @@
 
   .din-board {
     background: #070b14; border: 2px solid #334155; border-radius: 10px;
-    padding: 10px; position: relative; min-height: 560px; overflow-x: auto;
+    padding: 10px; position: relative; min-height: 580px; overflow-x: auto;
   }
   .bench-feedback {
     padding: 11px 13px; border-radius: 8px; font-size: 0.84rem; line-height: 1.45; font-weight: 600;
@@ -125,12 +124,12 @@
   .bench-feedback.success { border-left-color: var(--green); background: rgba(34,197,94,0.16); color: #bbf7d0; }
   .bench-feedback.step { border-left-color: var(--amber); background: rgba(245,158,11,0.14); color: #fde68a; }
 
-  .pin-hotspot { cursor: pointer; transition: 0.15s; }
-  .pin-hotspot:hover circle { r: 7; stroke: #38bdf8; stroke-width: 2.5; }
-  .pin-selected circle { fill: #f59e0b !important; stroke: #fff !important; stroke-width: 2.5 !important; r: 7.5 !important; }
-  .pin-done circle { fill: #22c55e !important; }
+  .pin-hotspot { cursor: pointer; }
+  .pin-hotspot:hover .pin-dot { r: 7.5; stroke: #ffffff; stroke-width: 2.5; }
+  .pin-selected .pin-dot { fill: #f59e0b !important; stroke: #ffffff !important; stroke-width: 3 !important; r: 8 !important; }
+  .pin-done .pin-dot { fill: #22c55e !important; }
+  .pin-label-txt { pointer-events: none; user-select: none; }
 
-  /* TESTE DE BANCADA PÓS-MONTAGEM */
   .bench-test-box {
     background: linear-gradient(135deg, #090d16 0%, #172554 100%);
     border: 1.5px solid var(--accent); border-radius: 10px; padding: 12px;
@@ -165,7 +164,6 @@
   .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; font-size: 0.78rem; }
   .score-cell { background: #090d16; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--border); }
 
-  /* Sub-tabs & Tables */
   .sub-tabs { display: flex; gap: 6px; background: #090d16; padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
   .sub-btn {
     flex: 1; padding: 7px 10px; border: none; border-radius: 6px; background: transparent;
@@ -186,7 +184,6 @@
   .state-live { color: var(--green); font-weight: 700; }
   .state-dead { color: var(--muted); }
 
-  /* Controls & Tanks */
   .controls-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
   .ctrl-card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px; }
   .ctrl-card label { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
@@ -244,7 +241,6 @@
   }
   .alert-banner.show { display: block; }
 
-  /* Studio */
   .studio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
   @media (max-width: 900px) { .studio-grid { grid-template-columns: 1fr; } }
   .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
@@ -320,9 +316,10 @@
         <div id="bench-comp-palette" class="comp-palette"></div>
       </div>
 
-      <div style="display:flex; gap:6px; margin-top:auto; flex-wrap:wrap;">
-        <button type="button" id="btn-bench-hint" class="btn btn-amber" style="flex:1;">💡 Dica</button>
-        <button type="button" id="btn-bench-reset" class="btn btn-slate">🔄 Limpar Tudo</button>
+      <div style="display:flex; gap:5px; margin-top:auto; flex-wrap:wrap;">
+        <button type="button" id="btn-bench-hint" class="btn btn-amber" style="flex:1; padding:8px 6px;">💡 Dica</button>
+        <button type="button" id="btn-auto-step" class="btn btn-green" style="flex:1.3; padding:8px 6px;">⚡ Auto-Conectar Passo</button>
+        <button type="button" id="btn-bench-reset" class="btn btn-slate" style="padding:8px 8px;">🔄 Limpar</button>
       </div>
     </div>
 
@@ -331,6 +328,7 @@
         <span>2. Bancada de Fiação (Origem → Destino)</span>
         <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
           <span id="bench-selected-pin" class="badge badge-warn">Nenhum borne</span>
+          <button type="button" id="btn-cancel-pin" class="btn btn-slate" style="padding:4px 8px; font-size:0.73rem; display:none;">✕ Cancelar Borne</button>
           <button type="button" id="btn-export-png" class="btn btn-blue" style="padding:5px 9px; font-size:0.75rem;">🖼️ PNG HD</button>
           <button type="button" id="btn-export-pdf" class="btn btn-green" style="padding:5px 9px; font-size:0.75rem;">📄 Relatório PDF</button>
         </div>
@@ -340,7 +338,6 @@
         Selecione os componentes no almoxarifado à esquerda para fixá-los nos trilhos DIN da bancada.
       </div>
 
-      <!-- PAINEL DE TESTE ENERGIZADO PÓS-MONTAGEM -->
       <div id="bench-test-box" class="bench-test-box">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
           <strong style="color:#38bdf8; font-size:0.86rem;">⚡ TESTE ENERGIZADO DO PROJETO MONTADO</strong>
@@ -351,7 +348,7 @@
       </div>
 
       <div class="din-board">
-        <svg id="bench-svg" viewBox="0 0 760 560"></svg>
+        <svg id="bench-svg" viewBox="0 0 820 580"></svg>
       </div>
     </div>
 
@@ -362,10 +359,10 @@
 
       <div id="bench-inspector" class="pinout-card">
         <h4>🔍 Inspetor de Bornes em Tempo Real</h4>
-        <p style="color:var(--muted);">Toque em qualquer borne na bancada para ler sua identificação IEC/NBR, tensão de trabalho (110V, 220V ou 380V) e função elétrica exata.</p>
+        <p style="color:var(--muted);">Toque no círculo azul de qualquer borne na bancada para selecionar a origem e depois toque no círculo de destino.</p>
       </div>
 
-      <div id="bench-right-dynamic" class="pinout-card" style="flex:1; overflow-y:auto; max-height:420px;">
+      <div id="bench-right-dynamic" class="pinout-card" style="flex:1; overflow-y:auto; max-height:430px;">
         <h4>📋 Sequência Correta de Ligação</h4>
         <div id="bench-steps-list"></div>
       </div>
@@ -794,7 +791,6 @@
 
 <script>
 (function() {
-  // PWA Manifest para Android
   try {
     const manifestObj = {
       name: "Vivenzo Laboratório de Automações",
@@ -867,112 +863,112 @@
   const ALL_BENCH_COMPONENTS = [
     {
       id: "dj63", name: "01. Disjuntor Trifásico 63A", desc: "Saídas 2 (L1), 4 (L2), 6 (L3) · 380V",
-      x: 20, y: 32, w: 170, h: 85,
+      x: 16, y: 32, w: 220, h: 88,
       pins: [
-        { id: "dj63_2", label: "2 (L1)", rx: 30, ry: 72, info: "Saída Fase L1 (380V) do Disjuntor Trifásico 63A." },
-        { id: "dj63_4", label: "4 (L2)", rx: 85, ry: 72, info: "Saída Fase L2 (380V) do Disjuntor Trifásico 63A." },
-        { id: "dj63_6", label: "6 (L3)", rx: 140, ry: 72, info: "Saída Fase L3 (380V) do Disjuntor Trifásico 63A." }
+        { id: "dj63_2", label: "2(L1)", rx: 25, ry: 72, info: "Saída Fase L1 (380V) do Disjuntor Trifásico 63A." },
+        { id: "dj63_4", label: "4(L2)", rx: 95, ry: 72, info: "Saída Fase L2 (380V) do Disjuntor Trifásico 63A." },
+        { id: "dj63_6", label: "6(L3)", rx: 165, ry: 72, info: "Saída Fase L3 (380V) do Disjuntor Trifásico 63A." }
       ]
     },
     {
       id: "dj220", name: "02. Disjuntor Bipolar 220V", desc: "Borne 2 (Fase 220V) · Borne 4 (Neutro)",
-      x: 20, y: 32, w: 155, h: 85,
+      x: 16, y: 32, w: 220, h: 88,
       pins: [
-        { id: "dj220_2", label: "2 (Fase)", rx: 38, ry: 72, info: "Saída Fase 220V do Disjuntor Bipolar." },
-        { id: "dj220_4", label: "4 (Neutro)", rx: 105, ry: 72, info: "Saída Neutro (N) do Disjuntor Bipolar." }
+        { id: "dj220_2", label: "2(Fase)", rx: 35, ry: 72, info: "Saída Fase 220V do Disjuntor Bipolar." },
+        { id: "dj220_4", label: "4(Neutro)", rx: 130, ry: 72, info: "Saída Neutro (N) do Disjuntor Bipolar." }
       ]
     },
     {
       id: "dj110", name: "03. Disjuntor Comando 110V (127V)", desc: "Borne 2 (Fase 127V) · Borne 4 (Neutro)",
-      x: 20, y: 32, w: 155, h: 85,
+      x: 16, y: 32, w: 220, h: 88,
       pins: [
-        { id: "dj110_2", label: "2 (F 127V)", rx: 38, ry: 72, info: "Saída Fase 127V (110V) protegida para comando." },
-        { id: "dj110_4", label: "4 (Neutro)", rx: 105, ry: 72, info: "Saída Neutro para fechar bobina 110V (A2)." }
+        { id: "dj110_2", label: "2(F127V)", rx: 35, ry: 72, info: "Saída Fase 127V (110V) protegida para comando." },
+        { id: "dj110_4", label: "4(Neutro)", rx: 130, ry: 72, info: "Saída Neutro para fechar bobina 110V (A2)." }
       ]
     },
     {
       id: "rff", name: "04. Relé Falta de Fase (380V)", desc: "L1-L2-L3 · Contato 15-18 (Fecha OK)",
-      x: 205, y: 32, w: 175, h: 85,
+      x: 252, y: 32, w: 245, h: 88,
       pins: [
-        { id: "rff_l1", label: "L1", rx: 22, ry: 18, info: "Entrada de monitoramento Fase L1." },
-        { id: "rff_l2", label: "L2", rx: 62, ry: 18, info: "Entrada de monitoramento Fase L2." },
-        { id: "rff_l3", label: "L3", rx: 102, ry: 18, info: "Entrada de monitoramento Fase L3." },
-        { id: "rff_15", label: "15 (Com)", rx: 55, ry: 72, info: "Comum 15 do Relé Falta de Fase: recebe fase de comando." },
-        { id: "rff_18", label: "18 (NA)", rx: 120, ry: 72, info: "Saída 18: fecha quando as 3 fases estão presentes e na sequência." }
+        { id: "rff_l1", label: "L1", rx: 28, ry: 18, info: "Entrada de monitoramento Fase L1." },
+        { id: "rff_l2", label: "L2", rx: 105, ry: 18, info: "Entrada de monitoramento Fase L2." },
+        { id: "rff_l3", label: "L3", rx: 182, ry: 18, info: "Entrada de monitoramento Fase L3." },
+        { id: "rff_15", label: "15(Com)", rx: 40, ry: 72, info: "Comum 15 do Relé Falta de Fase: recebe fase de comando." },
+        { id: "rff_18", label: "18(NA)", rx: 145, ry: 72, info: "Saída 18: fecha quando as 3 fases estão presentes e na sequência." }
       ]
     },
     {
       id: "sel", name: "05. Chave Seletora MAN / 0 / AUT", desc: "1 (Comum) · 2 (Manual) · 4 (Automático)",
-      x: 395, y: 32, w: 175, h: 85,
+      x: 514, y: 32, w: 275, h: 88,
       pins: [
-        { id: "sel_1", label: "1 (Com)", rx: 30, ry: 72, info: "Borne 1 (Comum): recebe comando supervisionado." },
-        { id: "sel_2", label: "2 (MAN)", rx: 85, ry: 72, info: "Borne 2 (Manual): liga direto ignorando a boia." },
-        { id: "sel_4", label: "4 (AUT)", rx: 140, ry: 72, info: "Borne 4 (Automático): envia alimentação para a Chave Boia." }
+        { id: "sel_1", label: "1(Com)", rx: 28, ry: 72, info: "Borne 1 (Comum): recebe comando supervisionado." },
+        { id: "sel_2", label: "2(MAN)", rx: 112, ry: 72, info: "Borne 2 (Manual): liga direto ignorando a boia." },
+        { id: "sel_4", label: "4(AUT)", rx: 196, ry: 72, info: "Borne 4 (Automático): envia alimentação para a Chave Boia." }
       ]
     },
     {
       id: "b0", name: "06. Botão Desliga (1-2 NF)", desc: "Contato Normalmente Fechado (Parada)",
-      x: 205, y: 32, w: 145, h: 85,
+      x: 252, y: 32, w: 210, h: 88,
       pins: [
-        { id: "b0_1", label: "1 (NF)", rx: 35, ry: 72, info: "Entrada 1 do Botão Desliga (NF)." },
-        { id: "b0_2", label: "2 (NF)", rx: 100, ry: 72, info: "Saída 2 do Botão Desliga: alimenta Botão Liga (3) e Selo (13)." }
+        { id: "b0_1", label: "1(NF)", rx: 35, ry: 72, info: "Entrada 1 do Botão Desliga (NF)." },
+        { id: "b0_2", label: "2(NF)", rx: 125, ry: 72, info: "Saída 2 do Botão Desliga: alimenta Botão Liga (3) e Selo (13)." }
       ]
     },
     {
       id: "b1", name: "07. Botão Liga (3-4 NA)", desc: "Contato Normalmente Aberto (Partida)",
-      x: 365, y: 32, w: 145, h: 85,
+      x: 480, y: 32, w: 210, h: 88,
       pins: [
-        { id: "b1_3", label: "3 (NA)", rx: 35, ry: 72, info: "Entrada 3 do Botão Liga (NA)." },
-        { id: "b1_4", label: "4 (NA)", rx: 100, ry: 72, info: "Saída 4 do Botão Liga: manda pulso de partida para A1." }
+        { id: "b1_3", label: "3(NA)", rx: 35, ry: 72, info: "Entrada 3 do Botão Liga (NA)." },
+        { id: "b1_4", label: "4(NA)", rx: 125, ry: 72, info: "Saída 4 do Botão Liga: manda pulso de partida para A1." }
       ]
     },
     {
       id: "cont380", name: "08. Contator · Bobina 380V (A1-A2)", desc: "Força L1/L2/L3 · Bobina 380V (Fase+Fase)",
-      x: 20, y: 175, w: 255, h: 110,
+      x: 16, y: 175, w: 340, h: 112,
       pins: [
-        { id: "c380_a1", label: "A1 (380V)", rx: 28, ry: 18, info: "Borne A1 da Bobina 380V (Fase 1)." },
-        { id: "c380_l1", label: "L1", rx: 85, ry: 18, info: "Entrada de Força L1." },
-        { id: "c380_l2", label: "L2", rx: 135, ry: 18, info: "Entrada de Força L2." },
-        { id: "c380_l3", label: "L3", rx: 185, ry: 18, info: "Entrada de Força L3." },
-        { id: "c380_a2", label: "A2 (380V)", rx: 225, ry: 95, info: "Borne A2 da Bobina 380V (Fase 2 após Relé Térmico 95-96)." }
+        { id: "c380_a1", label: "A1(380)", rx: 28, ry: 18, info: "Borne A1 da Bobina 380V (Fase 1)." },
+        { id: "c380_l1", label: "L1", rx: 125, ry: 18, info: "Entrada de Força L1." },
+        { id: "c380_l2", label: "L2", rx: 195, ry: 18, info: "Entrada de Força L2." },
+        { id: "c380_l3", label: "L3", rx: 265, ry: 18, info: "Entrada de Força L3." },
+        { id: "c380_a2", label: "A2(380)", rx: 255, ry: 95, info: "Borne A2 da Bobina 380V (Fase 2 após Relé Térmico 95-96)." }
       ]
     },
     {
       id: "cont220", name: "09. Contator · Bobina 220V (A1-A2)", desc: "Força L1/L2 · Bobina 220V (Fase+Neutro)",
-      x: 205, y: 175, w: 235, h: 110,
+      x: 252, y: 175, w: 285, h: 112,
       pins: [
-        { id: "c220_a1", label: "A1 (220V)", rx: 30, ry: 18, info: "Borne A1 da Bobina 220V (Fase 220V)." },
-        { id: "c220_l1", label: "L1", rx: 88, ry: 18, info: "Entrada de Força L1." },
-        { id: "c220_l2", label: "L2", rx: 145, ry: 18, info: "Entrada de Força L2 (Neutro)." },
-        { id: "c220_a2", label: "A2 (220V)", rx: 200, ry: 95, info: "Borne A2 da Bobina 220V (Retorno após Relé Térmico 96)." }
+        { id: "c220_a1", label: "A1(220)", rx: 28, ry: 18, info: "Borne A1 da Bobina 220V (Fase 220V)." },
+        { id: "c220_l1", label: "L1", rx: 125, ry: 18, info: "Entrada de Força L1." },
+        { id: "c220_l2", label: "L2", rx: 205, ry: 18, info: "Entrada de Força L2 (Neutro)." },
+        { id: "c220_a2", label: "A2(220)", rx: 205, ry: 95, info: "Borne A2 da Bobina 220V (Retorno após Relé Térmico 96)." }
       ]
     },
     {
       id: "cont110", name: "10. Contator · Bobina 110V + Selo (13-14)", desc: "Bobina 110V (A1-A2) · Auxiliar NA (13-14)",
-      x: 205, y: 175, w: 280, h: 110,
+      x: 252, y: 175, w: 360, h: 112,
       pins: [
-        { id: "c110_a1", label: "A1 (110V)", rx: 32, ry: 18, info: "Borne A1 da Bobina 110V (127V)." },
-        { id: "c110_13", label: "13 (NA)", rx: 105, ry: 18, info: "Borne 13 (NA) do contato de selo." },
-        { id: "c110_14", label: "14 (NA)", rx: 175, ry: 18, info: "Borne 14 (NA) do contato de selo." },
-        { id: "c110_a2", label: "A2 (110V)", rx: 240, ry: 18, info: "Borne A2 da Bobina 110V (Neutro)." }
+        { id: "c110_a1", label: "A1(110)", rx: 28, ry: 18, info: "Borne A1 da Bobina 110V (127V)." },
+        { id: "c110_13", label: "13(NA)", rx: 120, ry: 18, info: "Borne 13 (NA) do contato de selo." },
+        { id: "c110_14", label: "14(NA)", rx: 205, ry: 18, info: "Borne 14 (NA) do contato de selo." },
+        { id: "c110_a2", label: "A2(110)", rx: 285, ry: 18, info: "Borne A2 da Bobina 110V (Neutro)." }
       ]
     },
     {
       id: "rt", name: "11. Relé de Proteção Térmica", desc: "95-96 (NF Corte) · 97-98 (NA Alarme) · T1/T2/T3",
-      x: 20, y: 315, w: 255, h: 105,
+      x: 16, y: 318, w: 340, h: 108,
       pins: [
-        { id: "rt_95", label: "95 (NF)", rx: 155, ry: 20, info: "Borne 95 (NF): entrada de proteção térmica." },
-        { id: "rt_96", label: "96 (NF)", rx: 210, ry: 20, info: "Borne 96 (NF): saída protegida para bobina A2." },
-        { id: "rt_97", label: "97 (NA)", rx: 155, ry: 88, info: "Borne 97 (NA): entrada para sinalização de falha." },
-        { id: "rt_98", label: "98 (NA)", rx: 210, ry: 88, info: "Borne 98 (NA): fecha em sobrecarga para acender sinaleiro." },
-        { id: "rt_t1", label: "T1", rx: 30, ry: 88, info: "Saída de potência T1 para o motor." },
-        { id: "rt_t2", label: "T2", rx: 75, ry: 88, info: "Saída de potência T2 para o motor." },
-        { id: "rt_t3", label: "T3", rx: 118, ry: 88, info: "Saída de potência T3 para o motor." }
+        { id: "rt_95", label: "95(NF)", rx: 185, ry: 20, info: "Borne 95 (NF): entrada de proteção térmica." },
+        { id: "rt_96", label: "96(NF)", rx: 265, ry: 20, info: "Borne 96 (NF): saída protegida para bobina A2." },
+        { id: "rt_97", label: "97(NA)", rx: 185, ry: 90, info: "Borne 97 (NA): entrada para sinalização de falha." },
+        { id: "rt_98", label: "98(NA)", rx: 265, ry: 90, info: "Borne 98 (NA): fecha em sobrecarga para acender sinaleiro." },
+        { id: "rt_t1", label: "T1", rx: 28, ry: 90, info: "Saída de potência T1 para o motor." },
+        { id: "rt_t2", label: "T2", rx: 80, ry: 90, info: "Saída de potência T2 para o motor." },
+        { id: "rt_t3", label: "T3", rx: 132, ry: 90, info: "Saída de potência T3 para o motor." }
       ]
     },
     {
       id: "boia_inf", name: "12. Chave Boia Inferior (Cisterna)", desc: "AZUL (Com) + MARROM (NF Anti-Seco)",
-      x: 505, y: 175, w: 235, h: 110,
+      x: 555, y: 175, w: 245, h: 112,
       pins: [
         { id: "bi_azul", label: "AZUL (Com)", rx: 25, ry: 26, info: "Fio AZUL (Comum) da Cisterna." },
         { id: "bi_preto", label: "PRETO (NA)", rx: 25, ry: 58, info: "Fio PRETO (NA) da Cisterna (NÃO usar para anti-seco)." },
@@ -981,7 +977,7 @@
     },
     {
       id: "boia_sup", name: "13. Chave Boia Superior / Poço", desc: "AZUL (Com) · PRETO (NA Encher) · MARROM (NF Drenar)",
-      x: 505, y: 315, w: 235, h: 110,
+      x: 555, y: 318, w: 245, h: 108,
       pins: [
         { id: "bs_azul", label: "AZUL (Com)", rx: 25, ry: 26, info: "Fio AZUL (Comum) da Chave Boia." },
         { id: "bs_preto", label: "PRETO (NA)", rx: 25, ry: 58, info: "Fio PRETO (NA): fecha quando o nível baixa (Encher Caixa)." },
@@ -990,13 +986,13 @@
     },
     {
       id: "sinaleiro", name: "14. Sinaleiro Falha Térmica / Bomba", desc: "Bornes X1 (Fase/Comando) · X2 (Retorno) + Motor",
-      x: 20, y: 455, w: 255, h: 85,
+      x: 16, y: 462, w: 340, h: 88,
       pins: [
-        { id: "sin_x1", label: "X1 (Lâmp.)", rx: 32, ry: 22, info: "Borne X1 do Sinaleiro LED (recebe sinal de 98 do Relé Térmico)." },
-        { id: "sin_x2", label: "X2 (Ret.)", rx: 105, ry: 22, info: "Borne X2 do Sinaleiro LED (retorno para Neutro ou 2ª Fase)." },
+        { id: "sin_x1", label: "X1", rx: 28, ry: 22, info: "Borne X1 do Sinaleiro LED (recebe sinal de 98 do Relé Térmico)." },
+        { id: "sin_x2", label: "X2", rx: 90, ry: 22, info: "Borne X2 do Sinaleiro LED (retorno para Neutro ou 2ª Fase)." },
         { id: "m_u1", label: "U1", rx: 165, ry: 22, info: "Terminal U1 do Motor / Bomba." },
-        { id: "m_v1", label: "V1", rx: 200, ry: 22, info: "Terminal V1 do Motor / Bomba." },
-        { id: "m_w1", label: "W1", rx: 235, ry: 22, info: "Terminal W1 do Motor / Bomba." }
+        { id: "m_v1", label: "V1", rx: 225, ry: 22, info: "Terminal V1 do Motor / Bomba." },
+        { id: "m_w1", label: "W1", rx: 285, ry: 22, info: "Terminal W1 do Motor / Bomba." }
       ]
     }
   ];
@@ -1074,7 +1070,7 @@
 
   let benchState = {
     circuitKey: "ind_poco_380_full",
-    mode: "train", // "train" | "exam" | "free"
+    mode: "train",
     placedIds: [],
     completedWires: [],
     freeWires: [],
@@ -1210,6 +1206,13 @@
     document.getElementById('tst-rt').addEventListener('click', function() { t.rtTrip = !t.rtTrip; if (t.rtTrip) t.seloAtivo = false; renderBench(); });
   }
 
+  function getNextPendingIndex(circ) {
+    for (let i = 0; i < circ.wires.length; i++) {
+      if (!benchState.completedWires.includes(i)) return i;
+    }
+    return -1;
+  }
+
   function renderBench() {
     const circ = getCircuit();
     const isExam = benchState.mode === "exam";
@@ -1220,11 +1223,16 @@
       : requiredIds.every(function(id) { return benchState.placedIds.includes(id); });
     const isFinished = !isFree && benchState.completedWires.length === circ.wires.length;
     const testActive = evaluateBenchTest().active && (isFinished || (isFree && benchState.freeWires.length > 0));
+    const nextPendingIdx = getNextPendingIndex(circ);
 
     const palette = document.getElementById('bench-comp-palette');
     const rightDynamic = document.getElementById('bench-right-dynamic');
     const svg = document.getElementById('bench-svg');
     const hintBtn = document.getElementById('btn-bench-hint');
+    const autoStepBtn = document.getElementById('btn-auto-step');
+    const cancelBtn = document.getElementById('btn-cancel-pin');
+
+    cancelBtn.style.display = benchState.selectedPin ? 'inline-block' : 'none';
 
     document.getElementById('mode-train-btn').classList.toggle('active', benchState.mode === "train");
     document.getElementById('mode-exam-btn').classList.toggle('active', isExam);
@@ -1235,11 +1243,13 @@
 
     hintBtn.disabled = isExam || isFree;
     hintBtn.textContent = isExam ? '🔒 Sem Dicas' : (isFree ? '⚡ Livre' : '💡 Dica');
+    autoStepBtn.style.display = (benchState.mode === "train") ? 'inline-block' : 'none';
+    autoStepBtn.disabled = isFinished;
+
     document.getElementById('right-panel-title').textContent = isExam
       ? '3. Boletim de Avaliação Prática'
       : (isFree ? '3. Cabos Conectados (Bancada Livre)' : '3. Sequência Correta de Ligação');
 
-    // Renderiza TODOS os 14 componentes no almoxarifado
     palette.innerHTML = '';
     ALL_BENCH_COMPONENTS.forEach(function(comp) {
       const isPlaced = benchState.placedIds.includes(comp.id);
@@ -1261,7 +1271,7 @@
             if (nowAll) {
               setBenchFeedback(isExam
                 ? 'PROVA INICIADA: Todos os componentes necessários fixados! Conecte os bornes sem ajuda.'
-                : 'Componentes fixados! Siga o Passo 1 clicando no borne de origem e depois no destino.', 'success');
+                : 'Componentes fixados! Siga o Passo 1 clicando no círculo azul de origem e depois no destino.', 'success');
             } else {
               setBenchFeedback('"' + comp.name + '" fixado! Fixe os componentes marcados com ★ Necessário.', 'step');
             }
@@ -1275,7 +1285,6 @@
       palette.appendChild(btn);
     });
 
-    // Painel Direito
     if (isFree) {
       let freeHTML = '<h4>🔌 Ligações Realizadas (' + benchState.freeWires.length + ')</h4>';
       if (benchState.freeWires.length === 0) {
@@ -1291,7 +1300,7 @@
       let html = '<h4>📋 Sequência Correta de Ligação</h4><div id="bench-steps-list">';
       circ.wires.forEach(function(w, idx) {
         const done = benchState.completedWires.includes(idx);
-        const isCurrent = !done && idx === benchState.completedWires.length && allReqPlaced;
+        const isCurrent = !done && idx === nextPendingIdx && allReqPlaced;
         html += '<div class="pin-row" style="opacity:' + (done ? '0.65' : '1') + ';">' +
           '<span class="pin-badge" style="color:' + (done ? '#22c55e' : (isCurrent ? '#f59e0b' : '#94a3b8')) + ';">' +
           (done ? '✓ OK' : 'Passo ' + (idx + 1)) + '</span>' +
@@ -1341,14 +1350,13 @@
       progBadge.className = 'badge badge-on';
     }
 
-    // Desenho SVG da Bancada
     const titleHeader = isFree ? 'BANCADA LIVRE VIVENZO · MONTAGEM CUSTOMIZADA (14 COMPONENTES DISPONÍVEIS)' : circ.name;
-    let svgHTML = '<rect x="0" y="0" width="760" height="560" fill="#070b14"/>';
+    let svgHTML = '<rect x="0" y="0" width="820" height="580" fill="#070b14"/>';
     svgHTML += '<text x="16" y="20" fill="#38bdf8" font-size="10.5" font-weight="800">' + titleHeader + '</text>';
-    svgHTML += '<rect x="15" y="68" width="730" height="14" rx="3" fill="#1e293b" stroke="#475569"/>';
-    svgHTML += '<rect x="15" y="220" width="730" height="14" rx="3" fill="#1e293b" stroke="#475569"/>';
-    svgHTML += '<rect x="15" y="360" width="730" height="14" rx="3" fill="#1e293b" stroke="#475569"/>';
-    svgHTML += '<rect x="15" y="490" width="730" height="14" rx="3" fill="#1e293b" stroke="#475569"/>';
+    svgHTML += '<rect x="15" y="68" width="790" height="14" rx="3" fill="#1e293b" stroke="#475569"/>';
+    svgHTML += '<rect x="15" y="220" width="790" height="14" rx="3" fill="#1e293b" stroke="#475569"/>';
+    svgHTML += '<rect x="15" y="362" width="790" height="14" rx="3" fill="#1e293b" stroke="#475569"/>';
+    svgHTML += '<rect x="15" y="498" width="790" height="14" rx="3" fill="#1e293b" stroke="#475569"/>';
 
     const pinCoords = {};
     benchState.placedIds.forEach(function(compId) {
@@ -1379,9 +1387,9 @@
       const isContactor = comp.id.startsWith('cont');
       const strokeCol = (isContactor && testActive) ? '#22c55e' : '#94a3b8';
       svgHTML += '<rect x="' + comp.x + '" y="' + comp.y + '" width="' + comp.w + '" height="' + comp.h + '" rx="8" fill="#1e293b" stroke="' + strokeCol + '" stroke-width="' + ((isContactor && testActive) ? '2.8' : '1.8') + '"/>';
-      svgHTML += '<text x="' + (comp.x + 8) + '" y="' + (comp.y + comp.h / 2 + 3) + '" fill="#f8fafc" font-size="9" font-weight="800">' + comp.name + '</text>';
+      svgHTML += '<text class="pin-label-txt" x="' + (comp.x + 8) + '" y="' + (comp.y + comp.h / 2 + 3) + '" fill="#f8fafc" font-size="9.2" font-weight="800">' + comp.name + '</text>';
       if (isContactor && (isFinished || isFree)) {
-        svgHTML += '<text x="' + (comp.x + 8) + '" y="' + (comp.y + comp.h / 2 + 16) + '" fill="' + (testActive ? '#4ade80' : '#94a3b8') + '" font-size="8" font-weight="800">' + (testActive ? '● BOBINA ATRACADA' : '○ REPOUSO') + '</text>';
+        svgHTML += '<text class="pin-label-txt" x="' + (comp.x + 8) + '" y="' + (comp.y + comp.h / 2 + 16) + '" fill="' + (testActive ? '#4ade80' : '#94a3b8') + '" font-size="8" font-weight="800">' + (testActive ? '● BOBINA ATRACADA' : '○ REPOUSO') + '</text>';
       }
 
       comp.pins.forEach(function(p) {
@@ -1390,15 +1398,17 @@
         const isSel = benchState.selectedPin === p.id;
         const isDone = activeWireList.some(function(w) { return w.from === p.id || w.to === p.id; });
         svgHTML += '<g class="pin-hotspot' + (isSel ? ' pin-selected' : '') + (isDone ? ' pin-done' : '') + '" data-pin="' + p.id + '">';
-        svgHTML += '<circle cx="' + cx + '" cy="' + cy + '" r="5.5" fill="' + (isDone ? '#22c55e' : '#38bdf8') + '" stroke="#0f172a" stroke-width="1.5"/>';
-        svgHTML += '<text x="' + (cx + 7) + '" y="' + (cy + 3) + '" fill="#e2e8f0" font-size="8.2" font-family="monospace" font-weight="800">' + p.label + '</text>';
+        svgHTML += '<circle cx="' + cx + '" cy="' + cy + '" r="10" fill="transparent"/>';
+        svgHTML += '<circle class="pin-dot" cx="' + cx + '" cy="' + cy + '" r="5.5" fill="' + (isDone ? '#22c55e' : '#38bdf8') + '" stroke="#0f172a" stroke-width="1.5"/>';
         svgHTML += '</g>';
+        svgHTML += '<text class="pin-label-txt" x="' + (cx + 8) + '" y="' + (cy + 3) + '" fill="#e2e8f0" font-size="8.4" font-family="monospace" font-weight="800">' + p.label + '</text>';
       });
     });
 
     svg.innerHTML = svgHTML;
     svg.querySelectorAll('.pin-hotspot').forEach(function(el) {
-      el.addEventListener('click', function() {
+      el.addEventListener('click', function(ev) {
+        ev.stopPropagation();
         handlePinClick(this.getAttribute('data-pin'), pinCoords);
       });
     });
@@ -1412,6 +1422,8 @@
     const isFree = benchState.mode === "free";
     const pData = pinCoords[pinId];
     if (!pData) return;
+
+    const shortComp = pData.compName.replace(/^\d+\.\s*/, '');
 
     document.getElementById('bench-inspector').innerHTML =
       '<h4>🔌 Borne: ' + pData.label + '</h4>' +
@@ -1433,7 +1445,8 @@
     const selBadge = document.getElementById('bench-selected-pin');
     if (!benchState.selectedPin) {
       benchState.selectedPin = pinId;
-      selBadge.textContent = 'Origem: ' + pData.label;
+      selBadge.textContent = 'Origem: ' + shortComp + ' [' + pData.label + ']';
+      setBenchFeedback('Origem selecionada: ' + shortComp + ' [' + pData.label + ']. Agora clique no borne de DESTINO.', 'step');
       renderBench();
       return;
     }
@@ -1441,17 +1454,20 @@
     if (benchState.selectedPin === pinId) {
       benchState.selectedPin = null;
       selBadge.textContent = 'Nenhum borne';
+      setBenchFeedback('Seleção cancelada. Clique no borne de origem para conectar.', 'step');
       renderBench();
       return;
     }
 
     const fromPin = benchState.selectedPin;
     const toPin = pinId;
+    const fromLabelFull = pinCoords[fromPin].compName.replace(/^\d+\.\s*/, '') + ' [' + pinCoords[fromPin].label + ']';
+    const toLabelFull = shortComp + ' [' + pData.label + ']';
 
     if (isFree) {
       const colors = ["#ef4444", "#f97316", "#eab308", "#3b82f6", "#22c55e", "#a855f7"];
       const wireColor = colors[benchState.freeWires.length % colors.length];
-      const lbl = pinCoords[fromPin].compName.slice(4, 18) + ' [' + pinCoords[fromPin].label + '] → ' + pData.compName.slice(4, 18) + ' [' + pData.label + ']';
+      const lbl = fromLabelFull + ' → ' + toLabelFull;
       benchState.freeWires.push({ from: fromPin, to: toPin, color: wireColor, label: lbl });
       benchState.selectedPin = null;
       selBadge.textContent = 'Nenhum borne';
@@ -1460,15 +1476,24 @@
       return;
     }
 
-    const nextIdx = benchState.completedWires.length;
-    const expected = circ.wires[nextIdx];
+    let matchedIdx = -1;
+    for (let i = 0; i < circ.wires.length; i++) {
+      if (benchState.completedWires.includes(i)) continue;
+      const w = circ.wires[i];
+      if ((fromPin === w.from && toPin === w.to) || (fromPin === w.to && toPin === w.from)) {
+        matchedIdx = i;
+        break;
+      }
+    }
+
     benchState.attempts++;
 
-    if ((fromPin === expected.from && toPin === expected.to) || (fromPin === expected.to && toPin === expected.from)) {
-      benchState.completedWires.push(nextIdx);
+    if (matchedIdx !== -1) {
+      benchState.completedWires.push(matchedIdx);
       benchState.selectedPin = null;
       selBadge.textContent = 'Nenhum borne';
-      if (benchState.completedWires.length === circ.wires.length) {
+      const nextIdx = getNextPendingIndex(circ);
+      if (nextIdx === -1) {
         const finalScore = computeExamScore();
         setBenchFeedback(isExam
           ? ('PROVA FINALIZADA! Nota obtida: ' + finalScore + '/10,0 (' + benchState.errors + ' erro(s)). Teste abaixo ou exporte o PDF.')
@@ -1476,23 +1501,62 @@
       } else {
         setBenchFeedback(isExam
           ? ('Ligação ' + benchState.completedWires.length + '/' + circ.wires.length + ' aceita!')
-          : ('Conexão correta! Próximo passo: ' + circ.wires[benchState.completedWires.length].label), 'success');
+          : ('✓ Conectado: ' + fromLabelFull + ' → ' + toLabelFull + ' | Próximo: ' + circ.wires[nextIdx].label), 'success');
       }
     } else {
+      const expected = circ.wires[getNextPendingIndex(circ)];
       benchState.errors++;
-      let customErr = expected.errRules ? (expected.errRules[toPin] || expected.errRules[fromPin]) : null;
-      const errSummary = pinCoords[fromPin].label + ' → ' + pData.label + (customErr ? (' (' + customErr + ')') : '');
+      let customErr = (expected && expected.errRules) ? (expected.errRules[toPin] || expected.errRules[fromPin]) : null;
+      const errSummary = fromLabelFull + ' → ' + toLabelFull + (customErr ? (' (' + customErr + ')') : '');
       benchState.errorLogs.push(errSummary);
       setBenchFeedback(isExam
-        ? ('ERRO REGISTRADO (-pontos): Ligação incorreta entre ' + pinCoords[fromPin].label + ' e ' + pData.label + '.' + (customErr ? (' ' + customErr) : ''))
-        : (customErr || ('Conexão incorreta entre ' + pinCoords[fromPin].label + ' e ' + pData.label + '. Siga o passo atual: ' + expected.label)), 'error');
+        ? ('ERRO REGISTRADO (-pontos): Você conectou ' + fromLabelFull + ' → ' + toLabelFull + '.' + (customErr ? (' ' + customErr) : ''))
+        : ('✗ Você conectou: ' + fromLabelFull + ' → ' + toLabelFull + '. ' + (customErr || ('Passo esperado: ' + expected.label))), 'error');
       benchState.selectedPin = null;
       selBadge.textContent = 'Nenhum borne';
     }
     renderBench();
   }
 
-  // Exportação PNG e PDF
+  document.getElementById('btn-cancel-pin').addEventListener('click', function() {
+    benchState.selectedPin = null;
+    document.getElementById('bench-selected-pin').textContent = 'Nenhum borne';
+    setBenchFeedback('Seleção de borne cancelada. Selecione a origem novamente.', 'step');
+    renderBench();
+  });
+
+  // Botão Auto-Conectar Passo Atual (Exclusivo Modo Treino)
+  document.getElementById('btn-auto-step').addEventListener('click', function() {
+    if (benchState.mode !== "train") return;
+    const circ = getCircuit();
+    const allReqPlaced = circ.compIds.every(function(id) { return benchState.placedIds.includes(id); });
+    if (!allReqPlaced) {
+      circ.compIds.forEach(function(id) {
+        if (!benchState.placedIds.includes(id)) benchState.placedIds.push(id);
+      });
+      benchState.selectedPin = null;
+      document.getElementById('bench-selected-pin').textContent = 'Nenhum borne';
+      setBenchFeedback('⚡ Componentes fixados automaticamente! Clique novamente em "Auto-Conectar Passo" ou ligue manualmente.', 'success');
+      renderBench();
+      return;
+    }
+
+    const nextIdx = getNextPendingIndex(circ);
+    if (nextIdx === -1) return;
+
+    benchState.completedWires.push(nextIdx);
+    benchState.selectedPin = null;
+    document.getElementById('bench-selected-pin').textContent = 'Nenhum borne';
+
+    const afterIdx = getNextPendingIndex(circ);
+    if (afterIdx === -1) {
+      setBenchFeedback('⚡ Último passo auto-conectado! Circuito 100% montado. Use o painel de Teste Energizado abaixo.', 'success');
+    } else {
+      setBenchFeedback('⚡ Auto-conectado: ' + circ.wires[nextIdx].label + ' | Próximo: ' + circ.wires[afterIdx].label, 'success');
+    }
+    renderBench();
+  });
+
   function exportDiagramPNG() {
     const svgEl = document.getElementById('bench-svg');
     const serializer = new XMLSerializer();
@@ -1506,8 +1570,8 @@
     img.onload = function() {
       const scale = 2;
       const canvas = document.createElement('canvas');
-      canvas.width = 760 * scale;
-      canvas.height = 560 * scale;
+      canvas.width = 820 * scale;
+      canvas.height = 580 * scale;
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = '#070b14';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1646,10 +1710,11 @@
     if (benchState.mode !== "train") return;
     const circ = getCircuit();
     const allReqPlaced = circ.compIds.every(function(id) { return benchState.placedIds.includes(id); });
+    const nextIdx = getNextPendingIndex(circ);
     if (!allReqPlaced) {
       setBenchFeedback('Dica: Clique nos componentes marcados com "★ Necessário" (ou no botão "Fixar do Circuito").', 'step');
-    } else if (benchState.completedWires.length < circ.wires.length) {
-      setBenchFeedback('Dica do Passo Atual: ' + circ.wires[benchState.completedWires.length].label, 'step');
+    } else if (nextIdx !== -1) {
+      setBenchFeedback('Dica do Passo Atual: ' + circ.wires[nextIdx].label, 'step');
     } else {
       setBenchFeedback('Circuito concluído! Teste o funcionamento no painel azul logo abaixo.', 'success');
     }
