@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vivenzo · Bancada & Laboratório de Automação</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --panel: #111827;
+      --panel-alt: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --green: #22c55e;
+      --red: #ef4444;
+      --amber: #f59e0b;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand h1 { font-size: 1.15rem; font-weight: 800; color: var(--accent); letter-spacing: 0.3px; }
+    .brand p { font-size: 0.78rem; color: var(--muted); }
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      background: #070b14;
+      padding: 6px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      background: var(--panel-alt);
+      color: #cbd5e1;
+      border: 1px solid var(--border);
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .tab-btn:hover { border-color: var(--accent); color: #fff; }
+    .tab-btn.active { background: var(--accent); color: #0b1120; border-color: var(--accent); }
+    main { padding: 16px 20px; max-width: 1580px; margin: 0 auto; }
+    .module { display: none; }
+    .module.active { display: block; }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .panel-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .badge {
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .badge-on { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid #22c55e; }
+    .badge-off { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid #ef4444; }
+    .badge-warn { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+    .badge-info { background: rgba(56,189,248,0.2); color: #7dd3fc; border: 1px solid #38bdf8; }
+
+    .btn {
+      padding: 7px 12px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #fff;
+      transition: 0.15s;
+    }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-full { width: 100%; }
+    .btn-green { background: #16a34a; border-color: #22c55e; }
+    .btn-red { background: #dc2626; border-color: #ef4444; }
+    .btn-blue { background: #2563eb; border-color: #3b82f6; }
+    .btn-amber { background: #d97706; border-color: #f59e0b; }
+    .btn-slate { background: #334155; border-color: #475569; }
+    .btn-purple { background: #7e22ce; border-color: #a855f7; }
+
+    /* BANCADA INTERATIVA */
+    .bench-grid {
+      display: grid;
+      grid-template-columns: 270px 1fr 330px;
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 1180px) {
+      .bench-grid { grid-template-columns: 1fr; }
+    }
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 4px;
+      background: #070b14;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+    }
+    .mode-btn {
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      padding: 6px 4px;
+      border-radius: 5px;
+      font-size: 0.73rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .mode-btn.active { background: var(--accent); color: #0b1120; }
+    .comp-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 540px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .comp-item-btn {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: var(--panel-alt);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px 10px;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+    }
+    .comp-item-btn.required { border-color: #38bdf8; }
+    .comp-item-btn.placed { border-color: #22c55e; background: rgba(34,197,94,0.08); }
+    .comp-item-btn strong { display: block; font-size: 0.78rem; }
+    .comp-item-btn small { display: block; font-size: 0.69rem; color: var(--muted); }
+
+    .bench-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .bench-feedback {
+      padding: 9px 12px;
+      border-radius: 7px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+    }
+    .bench-feedback.step { background: rgba(56,189,248,0.12); border-color: #38bdf8; color: #bae6fd; }
+    .bench-feedback.success { background: rgba(34,197,94,0.14); border-color: #22c55e; color: #bbf7d0; }
+    .bench-feedback.error { background: rgba(239,68,68,0.16); border-color: #ef4444; color: #fecaca; }
+
+    #bench-svg {
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+    .pin-hotspot { cursor: pointer; }
+    .pin-selected .pin-dot { fill: #f59e0b !important; r: 9; }
+    .pin-target-ring {
+      fill: none;
+      stroke: #facc15;
+      stroke-width: 2.2;
+      stroke-dasharray: 3 2;
+    }
+    .pin-label-txt { user-select: none; pointer-events: none; }
+
+    .test-box {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(30,41,59,0.85);
+      border: 1px solid #38bdf8;
+    }
+    .test-box.show { display: block; }
+    .test-lamp {
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+    .test-lamp.running { background: rgba(34,197,94,0.2); border-color: #22c55e; color: #4ade80; }
+    .test-lamp.trip { background: rgba(239,68,68,0.2); border-color: #ef4444; color: #f87171; }
+    .test-controls { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+    .pin-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      padding: 6px 8px;
+      background: var(--panel-alt);
+      border-radius: 6px;
+      margin-bottom: 5px;
+      border: 1px solid var(--border);
+    }
+    .pin-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      background: #0f172a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .inspector-box {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 9px;
+      margin-bottom: 10px;
+      font-size: 0.78rem;
+    }
+    .scorecard {
+      background: #0f172a;
+      border: 1px solid var(--amber);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .score-big { font-size: 1.2rem; font-weight: 900; margin: 6px 0; }
+    .score-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .score-cell { background: var(--panel-alt); padding: 6px; border-radius: 6px; font-size: 0.72rem; text-align: center; }
+    .score-cell strong { display: block; font-size: 0.92rem; }
+    .history-header { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border); }
+    .history-item { background: var(--panel-alt); border: 1px solid var(--border); border-radius: 6px; padding: 7px; margin-top: 6px; font-size: 0.74rem; }
+    .history-item-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+    .history-meta { display: flex; gap: 10px; color: var(--muted); font-size: 0.7rem; margin-top: 3px; }
+
+    /* SIMULADORES OPERACIONAIS M1 & M2 */
+    .sim-grid {
+      display: grid;
+      grid-template-columns: 290px 1fr 310px;
+      gap: 14px;
+    }
+    @media (max-width: 1120px) {
+      .sim-grid { grid-template-columns: 1fr; }
+    }
+    .tank-wrap {
+      position: relative;
+      height: 170px;
+      background: #070b14;
+      border: 2px solid #475569;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .water-fill {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(180deg, rgba(56,189,248,0.65), rgba(2,132,199,0.9));
+      transition: height 0.25s;
+    }
+    .boia-float {
+      position: absolute;
+      right: 18px;
+      width: 28px;
+      height: 16px;
+      background: #f59e0b;
+      border: 2px solid #fff;
+      border-radius: 4px;
+      transition: bottom 0.25s, transform 0.25s;
+    }
+    .rotor-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--panel-alt);
+      padding: 8px 10px;
+      border-radius: 7px;
+      margin: 8px 0;
+    }
+    .rotor-wheel {
+      width: 26px; height: 26px;
+      border: 3px dashed var(--accent);
+      border-radius: 50%;
+    }
+    .rotor-wheel.spinning { animation: spin 0.7s linear infinite; border-color: var(--green); }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .wire-live { stroke: #ef4444; stroke-width: 3; fill: none; }
+    .wire-l2 { stroke: #f97316; stroke-width: 3; fill: none; }
+    .wire-l3 { stroke: #eab308; stroke-width: 3; fill: none; }
+    .wire-neutral { stroke: #3b82f6; stroke-width: 3; fill: none; }
+    .wire-cmd { stroke: #22c55e; stroke-width: 3; fill: none; }
+    .wire-off { stroke: #475569; stroke-width: 2; stroke-dasharray: 4 3; fill: none; }
+
+    .sel-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 8px 0; }
+    .sel-btn { padding: 6px; background: var(--panel-alt); border: 1px solid var(--border); color: #cbd5e1; border-radius: 5px; font-weight: 800; cursor: pointer; font-size: 0.75rem; }
+    .sel-btn.active { background: var(--amber); color: #0b1120; border-color: var(--amber); }
+
+    .diag-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; margin-top: 8px; }
+    .diag-table th, .diag-table td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }
+    .diag-table th { background: var(--panel-alt); color: var(--accent); }
+    .state-live { color: #4ade80; font-weight: 800; }
+    .state-dead { color: #94a3b8; }
+    .flood-banner { display: none; background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fecaca; padding: 7px 10px; border-radius: 6px; font-size: 0.76rem; font-weight: 800; margin-bottom: 8px; }
+    .flood-banner.show { display: block; }
+
+    /* ESTÚDIO & FORMULÁRIOS */
+    input[type="text"], input[type="password"], select, textarea {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+    }
+    textarea { min-height: 150px; font-family: monospace; }
+    .status-msg { font-size: 0.78rem; margin-top: 8px; font-weight: 700; }
+    .status-msg.ok { color: #4ade80; }
+    .status-msg.err { color: #f87171; }
+    .project-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--panel-alt); border: 1px solid var(--border); border-radius: 6px; margin-top: 6px; }
+    .custom-iframe { width: 100%; height: 680px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>⚡ VIVENZO · BANCADA & LABORATÓRIO DE AUTOMAÇÃO</h1>
+      <p>Treinamento Técnico, Simulação de Comandos Elétricos e Avaliação Prática Borne a Borne</p>
+    </div>
+    <span class="badge badge-info">v4.5 · 5 Circuitos Guiados + Bancada Livre</span>
+  </header>
+
+  <nav class="tabs" id="main-tabs">
+    <button type="button" class="tab-btn active" data-target="mod-bench">🔌 Bancada de Montagem (5 Circuitos)</button>
+    <button type="button" class="tab-btn" data-target="mod-m1">💧 Simulador 1: Reservatório 220V</button>
+    <button type="button" class="tab-btn" data-target="mod-m2">⚙️ Simulador 2: Poço Drenagem 380V</button>
+    <button type="button" class="tab-btn" id="btn-open-studio" data-target="studio">🛠️ Estúdio & Publicação GitHub</button>
+  </nav>
+
+  <main id="main-container">
+    <!-- MÓDULO 0: BANCADA INTERATIVA DE MONTAGEM -->
+    <section id="mod-bench" class="module active">
+      <div class="bench-grid">
+        <!-- COLUNA 1: ALMOXARIFADO DE COMPONENTES -->
+        <div class="panel">
+          <div class="panel-title">
+            <span>1. Almoxarifado (18 Peças)</span>
+          </div>
+          <div class="mode-switch">
+            <button type="button" id="mode-train-btn" class="mode-btn active">🎓 Treino</button>
+            <button type="button" id="mode-exam-btn" class="mode-btn">📝 Prova</button>
+            <button type="button" id="mode-free-btn" class="mode-btn">⚡ Livre</button>
+          </div>
+          <div id="exam-candidate-box" style="display:none; margin-bottom:10px;">
+            <label style="font-size:0.73rem; color:var(--muted); display:block; margin-bottom:3px;">Nome do Técnico Avaliado:</label>
+            <input type="text" id="exam-tech-name" placeholder="Ex.: João Silva" />
+          </div>
+          <div class="comp-list" id="bench-comp-palette"></div>
+        </div>
+
+        <!-- COLUNA 2: TRILHO DIN & FIAÇÃO -->
+        <div class="panel">
+          <div class="panel-title">
+            <span>2. Trilho DIN & Painel de Montagem</span>
+            <span id="bench-progress-badge" class="badge badge-info">Fixando: 0/6</span>
+          </div>
+
+          <div class="bench-toolbar">
+            <div id="circuit-select-wrap" style="flex:1; min-width:240px;">
+              <select id="bench-circuit-select">
+                <option value="ind_poco_380_full">1. Drenagem Poço 380V (RFF + Seletora + Boia + RT)</option>
+                <option value="cisterna_caixa_220">2. Predial 220V: Cisterna + Caixa Superior (Anti-Seco)</option>
+                <option value="cmd_110_selo">3. Comando 110V (127V): Contator + Selo (13-14) + Sinaleiro</option>
+                <option value="res_boia_220">4. Predial 220V: Contator 220V + RT + Boia 3 Fios</option>
+                <option value="reversao_motor_3f">5. Partida com Reversão 3Ø (K1 Horário + K2 Anti-Horário)</option>
+              </select>
+            </div>
+            <button type="button" id="btn-place-required" class="btn btn-blue">★ Fixar do Circuito</button>
+            <button type="button" id="btn-auto-step" class="btn btn-purple">⚡ Auto-Conectar Passo</button>
+            <button type="button" id="btn-bench-hint" class="btn btn-amber">💡 Dica</button>
+            <button type="button" id="btn-cancel-pin" class="btn btn-slate" style="display:none;">✕ Cancelar Borne</button>
+            <button type="button" id="btn-bench-reset" class="btn btn-red">🗑️ Limpar</button>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+            <span id="bench-selected-pin" class="badge badge-warn">Nenhum borne</span>
+            <div style="display:flex; gap:6px;">
+              <button type="button" id="btn-export-png" class="btn btn-slate">🖼️ Salvar PNG</button>
+              <button type="button" id="btn-export-pdf" class="btn btn-slate">📄 Relatório PDF</button>
+            </div>
+          </div>
+
+          <div id="bench-feedback" class="bench-feedback step">
+            Selecione um circuito acima e fixe os componentes marcados com ★ Necessário no trilho DIN.
+          </div>
+
+          <svg id="bench-svg" viewBox="0 0 820 580" xmlns="http://www.w3.org/2000/svg"></svg>
+
+          <div id="bench-test-box" class="test-box">
+            <div id="bench-test-lamp" class="test-lamp">⚪ REPOUSO / DESLIGADO</div>
+            <div id="bench-test-readout" style="font-size:0.79rem; color:#e2e8f0;"></div>
+            <div id="bench-test-controls" class="test-controls"></div>
+          </div>
+        </div>
+
+        <!-- COLUNA 3: INSPETOR & SEQUÊNCIA -->
+        <div class="panel">
+          <div class="panel-title">
+            <span id="right-panel-title">3. Sequência Correta de Ligação</span>
+          </div>
+          <div id="bench-inspector" class="inspector-box">
+            <h4>🔍 Inspetor de Bornes</h4>
+            <p style="color:var(--muted);">Clique em qualquer borne azul na bancada para ver sua função elétrica e iniciar uma conexão.</p>
+          </div>
+          <div id="bench-right-dynamic"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MÓDULO 1: SIMULADOR RESERVATÓRIO 220V -->
+    <section id="mod-m1" class="module">
+      <div class="sim-grid">
+        <div class="panel">
+          <div class="panel-title">
+            <span>Controles · Reservatório 220V</span>
+            <span id="m1-status-badge" class="badge badge-on">ABASTECENDO</span>
+          </div>
+          <button type="button" id="btn-m1-dj" class="btn btn-full btn-green">LIGADO (ON)</button>
+          <div class="tank-wrap">
+            <div id="m1-water" class="water-fill" style="height:25%;"></div>
+            <div id="m1-boia-icon" class="boia-float"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:8px;">
+            <strong id="m1-lvl-txt">Nível: 25%</strong>
+            <span style="color:var(--muted);">Liga ≤30% · Desliga ≥85%</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px;">
+            <button type="button" id="btn-m1-20" class="btn btn-blue">Simular 20% (Baixo)</button>
+            <button type="button" id="btn-m1-90" class="btn btn-amber">Simular 90% (Cheio)</button>
+          </div>
+          <label style="font-size:0.75rem; color:var(--muted);">Consumo Predial (Vazão de Saída):</label>
+          <input type="range" id="m1-drain" min="0" max="6" step="0.5" value="2" style="width:100%; margin:6px 0;" />
+          <div class="rotor-box">
+            <div id="m1-rotor" class="rotor-wheel spinning"></div>
+            <div>
+              <strong style="font-size:0.78rem; display:block;">Motobomba Recalque</strong>
+              <span id="m1-pump-state" style="font-size:0.75rem; font-weight:800; color:var(--green);">EM OPERAÇÃO (220V)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><span>Diagrama Funcional Energizado · 220V (Fase + Neutro)</span></div>
+          <svg viewBox="0 0 640 360" style="width:100%; background:#070b14; border-radius:8px; border:1px solid var(--border);">
+            <text x="16" y="24" fill="#38bdf8" font-size="11" font-weight="bold">QUADRO DE COMANDO · RESERVATÓRIO SUPERIOR (BOBINA 220V)</text>
+            <rect x="30" y="45" width="130" height="55" rx="6" fill="#1e293b" stroke="#64748b"/>
+            <text x="42" y="68" fill="#f8fafc" font-size="10" font-weight="bold">Disjuntor Bipolar</text>
+            <text id="svg-m1-dj" x="42" y="86" fill="#4ade80" font-size="9.5" font-weight="bold">FECHADO (ON)</text>
+
+            <rect x="230" y="45" width="160" height="75" rx="6" fill="#1e293b" stroke="#64748b"/>
+            <text x="242" y="68" fill="#f8fafc" font-size="10" font-weight="bold">Contator Potência 220V</text>
+            <text id="svg-m1-cont" x="242" y="88" fill="#4ade80" font-size="9.5" font-weight="bold">ATRACADA</text>
+
+            <rect x="460" y="45" width="150" height="75" rx="6" fill="#1e293b" stroke="#64748b"/>
+            <text x="472" y="68" fill="#f8fafc" font-size="10" font-weight="bold">Motobomba 220V</text>
+            <text id="svg-m1-pump" x="472" y="88" fill="#4ade80" font-size="9.5" font-weight="bold">BOMBANDO</text>
+
+            <rect x="230" y="210" width="230" height="75" rx="6" fill="#1e293b" stroke="#f59e0b"/>
+            <text x="242" y="234" fill="#fbbf24" font-size="10" font-weight="bold">Chave Boia Superior (3 Fios)</text>
+            <text id="svg-m1-boia" x="242" y="256" fill="#4ade80" font-size="9.5" font-weight="bold">NA FECHADO (AZUL+PRETO)</text>
+
+            <path id="w-m1-l1" d="M 160 65 L 230 65" class="wire-live"/>
+            <path id="w-m1-a1" d="M 200 65 L 200 105 L 230 105" class="wire-live"/>
+            <path id="w-m1-t1" d="M 390 65 L 460 65" class="wire-live"/>
+            <path id="w-m1-t2" d="M 390 95 L 460 95" class="wire-neutral"/>
+            <path id="w-m1-boia-out" d="M 340 210 L 340 120" class="wire-cmd"/>
+          </svg>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><span>Leituras Multímetro / Alicate</span></div>
+          <table class="diag-table">
+            <thead><tr><th>Ponto de Medição</th><th>Valor / Estado</th></tr></thead>
+            <tbody>
+              <tr><td>Entrada L1/N (Disjuntor)</td><td id="d-m1-l12">220 V</td></tr>
+              <tr><td>Bobina Contator (A1-A2)</td><td id="d-m1-coil">220 V</td></tr>
+              <tr><td>Contato Boia (Azul-Preto)</td><td id="d-m1-boia">Fechado (≤30%)</td></tr>
+              <tr><td>Saída Motor (T1-T2)</td><td id="d-m1-t12">220 V</td></tr>
+              <tr><td>Borne 2 (Fase L1)</td><td id="bt-m1-3" class="state-live">220V</td></tr>
+              <tr><td>Jumper L1 → A1</td><td id="bt-m1-4" class="state-live">Conectado</td></tr>
+              <tr><td>Neutro Comum Boia</td><td id="bt-m1-6" class="state-live">Neutro OK</td></tr>
+              <tr><td>Retorno Boia → A2</td><td id="bt-m1-7" class="state-live">Fechado</td></tr>
+              <tr><td>Alimentação Bomba</td><td id="bt-m1-8" class="state-live">220V</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- MÓDULO 2: SIMULADOR POÇO DRENAGEM 380V -->
+    <section id="mod-m2" class="module">
+      <div class="sim-grid">
+        <div class="panel">
+          <div class="panel-title">
+            <span>Controles · Poço 380V</span>
+            <span id="m2-status-badge" class="badge badge-warn">AGUARDANDO NÍVEL</span>
+          </div>
+          <div id="m2-flood-alert" class="flood-banner">⚠️ NÍVEL CRÍTICO ATINGIDO! Drenagem automática acionada.</div>
+          <button type="button" id="btn-m2-dj" class="btn btn-full btn-green">LIGADO (63A ON)</button>
+          <div class="sel-group">
+            <button type="button" id="sel-man" class="sel-btn">MAN (2)</button>
+            <button type="button" id="sel-0" class="sel-btn">0 (OFF)</button>
+            <button type="button" id="sel-aut" class="sel-btn active">AUT (4)</button>
+          </div>
+          <div class="tank-wrap">
+            <div id="m2-water" class="water-fill" style="height:35%;"></div>
+            <div id="m2-boia-icon" class="boia-float"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.78rem; margin-bottom:6px;">
+            <strong id="m2-lvl-txt">Nível Poço: 35%</strong>
+            <span style="color:var(--muted);">Liga ≥65% · Desliga ≤22%</span>
+          </div>
+          <label style="font-size:0.74rem; color:var(--muted);">Afluência de Água no Poço:</label>
+          <input type="range" id="m2-inflow" min="0" max="6" step="0.5" value="1.5" style="width:100%; margin:5px 0;" />
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:8px;">
+            <button type="button" id="btn-f-l2" class="btn btn-slate">Simular Falta L2</button>
+            <button type="button" id="btn-f-rt" class="btn btn-slate">Simular Térmico</button>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:8px;">
+            <button type="button" id="sc-low" class="btn btn-blue">Poço Baixo (18%)</button>
+            <button type="button" id="sc-crit" class="btn btn-amber">Poço Crítico (68%)</button>
+            <button type="button" id="sc-rt" class="btn btn-red">Teste Falha RT</button>
+            <button type="button" id="sc-phase" class="btn btn-red">Teste Falta Fase</button>
+          </div>
+          <div class="rotor-box">
+            <div id="m2-rotor" class="rotor-wheel"></div>
+            <div>
+              <strong style="font-size:0.78rem; display:block;">Bomba Submersa 380V 3Ø</strong>
+              <span id="m2-pump-state" style="font-size:0.75rem; font-weight:800; color:var(--muted);">PARADA</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><span>Diagrama Trifásico 380V · Relé Falta de Fase + Relé Térmico</span></div>
+          <svg viewBox="0 0 640 380" style="width:100%; background:#070b14; border-radius:8px; border:1px solid var(--border);">
+            <text x="16" y="24" fill="#38bdf8" font-size="11" font-weight="bold">PAINEL DRENAGEM 380V (BOBINA 380V L1+L2 · BOIA NF AZUL+MARROM)</text>
+            <rect x="25" y="45" width="125" height="65" rx="6" fill="#1e293b" stroke="#64748b"/>
+            <text x="35" y="68" fill="#f8fafc" font-size="10" font-weight="bold">Disjuntor 3Ø 63A</text>
+            <text id="svg-m2-dj" x="35" y="88" fill="#4ade80" font-size="9.5" font-weight="bold">FECHADO (63A)</text>
+
+            <rect x="195" y="45" width="145" height="65" rx="6" fill="#1e293b" stroke="#64748b"/>
+            <text x="205" y="68" fill="#f8fafc" font-size="10" font-weight="bold">Contator 380V</text>
+            <text id="svg-m2-cont" x="205" y="88" fill="#94a3b8" font-size="9.5" font-weight="bold">ABERTA</text>
+
+            <rect x="375" y="45" width="125" height="65" rx="6" fill="#1e293b" stroke="#64748b"/>
+            <text x="385" y="68" fill="#f8fafc" font-size="10" font-weight="bold">Relé Térmico</text>
+            <text id="svg-m2-rt" x="385" y="88" fill="#4ade80" font-size="9.5" font-weight="bold">95-96 FECHADO</text>
+
+            <rect x="525" y="45" width="95" height="65" rx="6" fill="#1e293b" stroke="#64748b"/>
+            <text x="535" y="68" fill="#f8fafc" font-size="10" font-weight="bold">Bomba 3Ø</text>
+            <text id="svg-m2-pump" x="535" y="88" fill="#94a3b8" font-size="9.5" font-weight="bold">PARADA</text>
+
+            <rect x="25" y="185" width="175" height="65" rx="6" fill="#1e293b" stroke="#38bdf8"/>
+            <text x="35" y="208" fill="#7dd3fc" font-size="10" font-weight="bold">Relé Falta de Fase</text>
+            <text id="svg-m2-rff" x="35" y="228" fill="#4ade80" font-size="9.5" font-weight="bold">OK (15-18 FECH.)</text>
+
+            <rect x="230" y="185" width="130" height="65" rx="6" fill="#1e293b" stroke="#f59e0b"/>
+            <text x="240" y="208" fill="#fbbf24" font-size="10" font-weight="bold">Seletora M-0-A</text>
+            <text id="svg-m2-sel" x="240" y="228" fill="#f8fafc" font-size="10" font-weight="bold">AUT</text>
+
+            <rect x="390" y="185" width="230" height="65" rx="6" fill="#1e293b" stroke="#22c55e"/>
+            <text x="400" y="208" fill="#4ade80" font-size="10" font-weight="bold">Boia Poço (Contato NF)</text>
+            <text id="svg-m2-boia" x="400" y="228" fill="#94a3b8" font-size="9.5" font-weight="bold">ABERTA (NÍVEL NORMAL)</text>
+
+            <path id="w2-p1" d="M 150 58 L 195 58" class="wire-live"/>
+            <path id="w2-l2" d="M 150 75 L 195 75" class="wire-l2"/>
+            <path id="w2-p2" d="M 150 75 L 195 75" class="wire-l2"/>
+            <path id="w2-p3" d="M 150 92 L 195 92" class="wire-l3"/>
+            <path id="w2-rt-in" d="M 340 75 L 375 75" class="wire-l2"/>
+            <path id="w2-rt-out" d="M 435 110 L 435 145 L 270 145 L 270 110" class="wire-l2"/>
+            <path id="w2-t1" d="M 500 58 L 525 58" class="wire-off"/>
+            <path id="w2-t2" d="M 500 75 L 525 75" class="wire-off"/>
+            <path id="w2-t3" d="M 500 92 L 525 92" class="wire-off"/>
+            <path id="w2-a1" d="M 480 185 L 480 130 L 240 130 L 240 110" class="wire-off"/>
+          </svg>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><span>Diagnóstico Trifásico 380V</span></div>
+          <table class="diag-table">
+            <thead><tr><th>Componente / Borne</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Disjuntor Geral 63A</td><td id="d-m2-dj">Fechado (380V)</td></tr>
+              <tr><td>Relé Falta de Fase</td><td id="d-m2-rff">OK (15-18)</td></tr>
+              <tr><td>Relé Térmico (95-96)</td><td id="d-m2-rt">Fechado (95-96)</td></tr>
+              <tr><td>Chave Boia Poço</td><td id="d-m2-boia">Aberta (&lt;65%)</td></tr>
+              <tr><td>Bobina Contator 380V</td><td id="d-m2-cont">0V</td></tr>
+              <tr><td>Fases L1/L2/L3</td><td id="bt-m2-2" class="state-live">380V OK</td></tr>
+              <tr><td>Série Térmica A2</td><td id="bt-m2-rt" class="state-live">Fechado</td></tr>
+              <tr><td>Saída RFF (18)</td><td id="bt-m2-5" class="state-live">Fechado</td></tr>
+              <tr><td>Seletora Pos. 4 (AUT)</td><td id="bt-m2-7" class="state-live">Ativo</td></tr>
+              <tr><td>Boia Poço → A1</td><td id="bt-m2-11" class="state-dead">Aberta</td></tr>
+              <tr><td>Saída Bomba U1/V1/W1</td><td id="bt-m2-13" class="state-dead">0V</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- MÓDULO 3: ESTÚDIO & PUBLICAÇÃO GITHUB -->
+    <section id="studio" class="module">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+        <div class="panel">
+          <div class="panel-title"><span>🛠️ Adicionar Módulo Customizado na Barra Superior</span></div>
+          <input type="hidden" id="edit-proj-id" />
+          <label style="font-size:0.78rem; color:var(--muted);">Título da Nova Aba:</label>
+          <input type="text" id="proj-title" placeholder="Ex.: Simulador Estrela-Triângulo" style="margin:6px 0 10px;" />
+          <label style="font-size:0.78rem; color:var(--muted);">Código HTML Completo do Simulador:</label>
+          <textarea id="proj-code" placeholder="Cole aqui o HTML completo..." style="margin:6px 0 10px;"></textarea>
+          <div style="display:flex; gap:8px;">
+            <button type="button" id="btn-save-proj" class="btn btn-green">💾 Salvar Aba</button>
+            <button type="button" id="btn-clear-proj" class="btn btn-slate">Limpar Campos</button>
+          </div>
+          <div id="studio-msg" class="status-msg"></div>
+          <div style="margin-top:14px;">
+            <strong style="font-size:0.82rem; color:var(--accent);">Módulos Extras Salvos:</strong>
+            <div id="custom-projects-list"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title"><span>🚀 Exportar ou Publicar Direto no GitHub Pages</span></div>
+          <p style="font-size:0.78rem; color:var(--muted); margin-bottom:10px;">
+            Baixe o arquivo <code>index.html</code> consolidado ou envie diretamente para o repositório <strong>edu00711811-oss/vivenzo-laboratorio-automacoes</strong>.
+          </p>
+          <button type="button" id="btn-download-site" class="btn btn-blue btn-full" style="margin-bottom:14px;">⬇️ Baixar index.html Completo</button>
+          <label style="font-size:0.78rem; color:var(--muted);">GitHub Personal Access Token (Fine-grained / Classic):</label>
+          <input type="password" id="gh-token" placeholder="ghp_..." style="margin:6px 0 10px;" />
+          <button type="button" id="btn-publish-gh" class="btn btn-green btn-full">☁️ Publicar Atualização no GitHub</button>
+          <div id="gh-msg" class="status-msg"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<script id="custom-data-script">
+  window.EMBEDDED_PROJECTS = [];
+</script>
+<script>
+(function() {
+  function switchTab(targetId) {
+    document.querySelectorAll('.tab-btn').forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-target') === targetId);
+    });
+    document.querySelectorAll('.module').forEach(function(m) {
+      m.classList.toggle('active', m.id === targetId);
+    });
+  }
+  document.getElementById('main-tabs').addEventListener('click', function(ev) {
+    const btn = ev.target.closest('.tab-btn');
+    if (btn) switchTab(btn.getAttribute('data-target'));
+  });
+
+  const ALL_BENCH_COMPONENTS = [
+    { id: "dj63", name: "Disjuntor Tripolar 63A", desc: "Proteção geral trifásica 380V (bornes 2, 4, 6)", x: 25, y: 32, w: 185, h: 72, titleTop: true,
+      pins: [
+        { id: "dj63_2", rx: 32, ry: 54, short: "2", label: "2 (L1)", info: "Saída Fase L1 (Vermelho) 380V" },
+        { id: "dj63_4", rx: 92, ry: 54, short: "4", label: "4 (L2)", info: "Saída Fase L2 (Laranja) 380V" },
+        { id: "dj63_6", rx: 152, ry: 54, short: "6", label: "6 (L3)", info: "Saída Fase L3 (Amarelo) 380V" }
+      ]
+    },
+    { id: "dj220", name: "Disjuntor Bipolar 220V", desc: "Alimentação monofásica/bifásica 220V (F + N)", x: 225, y: 32, w: 170, h: 72, titleTop: true,
+      pins: [
+        { id: "dj220_2", rx: 40, ry: 54, short: "2", label: "2 (F)", info: "Saída Fase 220V" },
+        { id: "dj220_4", rx: 115, ry: 54, short: "4", label: "4 (N)", info: "Saída Neutro" }
+      ]
+    },
+    { id: "dj110", name: "Disjuntor Comando 127V", desc: "Proteção comando 110V/127V (F + N)", x: 410, y: 32, w: 175, h: 72, titleTop: true,
+      pins: [
+        { id: "dj110_2", rx: 40, ry: 54, short: "2", label: "2 (F)", info: "Saída Fase 127V" },
+        { id: "dj110_4", rx: 115, ry: 54, short: "4", label: "4 (N)", info: "Saída Neutro" }
+      ]
+    },
+    { id: "rff", name: "Relé Falta de Fase", desc: "Supervisão L1/L2/L3 + Contato 15-18", x: 600, y: 28, w: 195, h: 86, titleTop: true,
+      pins: [
+        { id: "rff_l1", rx: 22, ry: 42, short: "L1", label: "L1", info: "Monitoramento Fase L1" },
+        { id: "rff_l2", rx: 76, ry: 42, short: "L2", label: "L2", info: "Monitoramento Fase L2" },
+        { id: "rff_l3", rx: 130, ry: 42, short: "L3", label: "L3", info: "Monitoramento Fase L3" },
+        { id: "rff_15", rx: 30, ry: 70, short: "15", label: "15 (COM)", info: "Contato Comum do Relé Falta de Fase" },
+        { id: "rff_18", rx: 112, ry: 70, short: "18", label: "18 (NA)", info: "Saída NA (fecha quando as 3 fases estão OK)" }
+      ]
+    },
+    { id: "cont380", name: "Contator Potência 380V", desc: "Contator principal 3Ø com bobina 380V (A1/A2)", x: 25, y: 175, w: 230, h: 95, titleTop: true,
+      pins: [
+        { id: "c380_l1", rx: 24, ry: 44, short: "L1", label: "L1", info: "Entrada Potência L1" },
+        { id: "c380_l2", rx: 85, ry: 44, short: "L2", label: "L2", info: "Entrada Potência L2" },
+        { id: "c380_l3", rx: 146, ry: 44, short: "L3", label: "L3", info: "Entrada Potência L3" },
+        { id: "c380_a1", rx: 24, ry: 76, short: "A1", label: "A1", info: "Alimentação Bobina 380V" },
+        { id: "c380_a2", rx: 115, ry: 76, short: "A2", label: "A2", info: "Retorno Bobina 380V (2ª Fase)" }
+      ]
+    },
+    { id: "cont220", name: "Contator 220V", desc: "Contator predial com bobina 220V (A1/A2)", x: 270, y: 175, w: 215, h: 95, titleTop: true,
+      pins: [
+        { id: "c220_l1", rx: 26, ry: 44, short: "L1", label: "L1", info: "Entrada Fase 220V" },
+        { id: "c220_l2", rx: 115, ry: 44, short: "L2", label: "L2", info: "Entrada Neutro/Fase" },
+        { id: "c220_a1", rx: 26, ry: 76, short: "A1", label: "A1", info: "Bobina 220V (A1)" },
+        { id: "c220_a2", rx: 115, ry: 76, short: "A2", label: "A2", info: "Bobina 220V (A2)" }
+      ]
+    },
+    { id: "cont110", name: "Contator 110V + Selo", desc: "Bobina 127V (A1/A2) + Auxiliar 13-14 (NA)", x: 500, y: 175, w: 280, h: 95, titleTop: true,
+      pins: [
+        { id: "c110_13", rx: 26, ry: 44, short: "13", label: "13 (NA)", info: "Entrada Contato Auxiliar de Selo" },
+        { id: "c110_14", rx: 135, ry: 44, short: "14", label: "14 (NA)", info: "Saída Contato Auxiliar de Selo" },
+        { id: "c110_a1", rx: 26, ry: 76, short: "A1", label: "A1", info: "Bobina 127V (A1)" },
+        { id: "c110_a2", rx: 135, ry: 76, short: "A2", label: "A2", info: "Bobina 127V (A2)" }
+      ]
+    },
+    { id: "cont_k1", name: "Contator K1 (Horário)", desc: "Potência L1-L3 + Auxiliar 13-14 (NA) e 21-22 (NF)", x: 25, y: 175, w: 375, h: 95, titleTop: true,
+      pins: [
+        { id: "k1_l1", rx: 22, ry: 42, short: "L1", label: "L1", info: "Entrada Potência L1 (K1)" },
+        { id: "k1_l2", rx: 75, ry: 42, short: "L2", label: "L2", info: "Entrada Potência L2 (K1)" },
+        { id: "k1_l3", rx: 128, ry: 42, short: "L3", label: "L3", info: "Entrada Potência L3 (K1)" },
+        { id: "k1_13", rx: 192, ry: 42, short: "13", label: "13", info: "Selo NA (13) de K1" },
+        { id: "k1_14", rx: 245, ry: 42, short: "14", label: "14", info: "Selo NA (14) de K1" },
+        { id: "k1_21", rx: 298, ry: 42, short: "21", label: "21", info: "Intertravamento NF (21) de K1" },
+        { id: "k1_22", rx: 342, ry: 42, short: "22", label: "22", info: "Intertravamento NF (22) de K1" },
+        { id: "k1_a1", rx: 22, ry: 76, short: "A1", label: "A1", info: "Bobina K1 (A1)" },
+        { id: "k1_a2", rx: 110, ry: 76, short: "A2", label: "A2", info: "Bobina K1 (A2)" }
+      ]
+    },
+    { id: "cont_k2", name: "Contator K2 (Anti-Horário)", desc: "Inversão L1↔L3 + Selo 13-14 (NA) + Intertrav. 21-22 (NF)", x: 415, y: 175, w: 380, h: 95, titleTop: true,
+      pins: [
+        { id: "k2_l1", rx: 22, ry: 42, short: "L1", label: "L1", info: "Entrada Potência L1 (K2)" },
+        { id: "k2_l2", rx: 75, ry: 42, short: "L2", label: "L2", info: "Entrada Potência L2 (K2)" },
+        { id: "k2_l3", rx: 128, ry: 42, short: "L3", label: "L3", info: "Entrada Potência L3 (K2)" },
+        { id: "k2_13", rx: 192, ry: 42, short: "13", label: "13", info: "Selo NA (13) de K2" },
+        { id: "k2_14", rx: 245, ry: 42, short: "14", label: "14", info: "Selo NA (14) de K2" },
+        { id: "k2_21", rx: 298, ry: 42, short: "21", label: "21", info: "Intertravamento NF (21) de K2" },
+        { id: "k2_22", rx: 342, ry: 42, short: "22", label: "22", info: "Intertravamento NF (22) de K2" },
+        { id: "k2_a1", rx: 22, ry: 76, short: "A1", label: "A1", info: "Bobina K2 (A1)" },
+        { id: "k2_a2", rx: 110, ry: 76, short: "A2", label: "A2", info: "Bobina K2 (A2)" }
+      ]
+    },
+    { id: "rt", name: "Relé Térmico Sobrecarga", desc: "Contatos 95-96 (NF), 97-98 (NA) e saída T1/T2/T3", x: 25, y: 315, w: 335, h: 95, titleTop: true,
+      pins: [
+        { id: "rt_95", rx: 22, ry: 44, short: "95", label: "95 (NF)", info: "Entrada Contato Fechado de Proteção" },
+        { id: "rt_96", rx: 95, ry: 44, short: "96", label: "96 (NF)", info: "Saída Contato Fechado (abre em sobrecarga)" },
+        { id: "rt_97", rx: 175, ry: 44, short: "97", label: "97 (NA)", info: "Entrada Contato Alarme" },
+        { id: "rt_98", rx: 255, ry: 44, short: "98", label: "98 (NA)", info: "Saída Contato Alarme" },
+        { id: "rt_t1", rx: 22, ry: 76, short: "T1", label: "T1", info: "Saída Potência Fase 1 para Motor" },
+        { id: "rt_t2", rx: 95, ry: 76, short: "T2", label: "T2", info: "Saída Potência Fase 2 para Motor" },
+        { id: "rt_t3", rx: 175, ry: 76, short: "T3", label: "T3", info: "Saída Potência Fase 3 para Motor" }
+      ]
+    },
+    { id: "sel", name: "Chave Seletora MAN-0-AUT", desc: "Comum 1 · Posição 2 (Manual) · Posição 4 (Automático)", x: 375, y: 315, w: 205, h: 95, titleTop: true,
+      pins: [
+        { id: "sel_1", rx: 26, ry: 48, short: "1", label: "1 (COM)", info: "Entrada Comum da Seletora" },
+        { id: "sel_2", rx: 105, ry: 48, short: "2", label: "2 (MAN)", info: "Saída Manual" },
+        { id: "sel_4", rx: 26, ry: 78, short: "4", label: "4 (AUT)", info: "Saída Automático" }
+      ]
+    },
+    { id: "b0", name: "Botoeira Desliga (NF)", desc: "Botão vermelho de parada (bornes 1-2 NF)", x: 595, y: 315, w: 200, h: 44, titleTop: false,
+      pins: [
+        { id: "b0_1", rx: 128, ry: 15, short: "1", label: "1", info: "Entrada NF Botão Desliga" },
+        { id: "b0_2", rx: 128, ry: 33, short: "2", label: "2", info: "Saída NF Botão Desliga" }
+      ]
+    },
+    { id: "b1", name: "Botoeira Liga / K1 (NA)", desc: "Botão verde de partida / sentido horário (3-4 NA)", x: 595, y: 366, w: 200, h: 44, titleTop: false,
+      pins: [
+        { id: "b1_3", rx: 128, ry: 15, short: "3", label: "3", info: "Entrada NA Botão Liga" },
+        { id: "b1_4", rx: 128, ry: 33, short: "4", label: "4", info: "Saída NA Botão Liga" }
+      ]
+    },
+    { id: "b2", name: "Botoeira Reversão K2 (NA)", desc: "Botão partida sentido anti-horário (3-4 NA)", x: 595, y: 418, w: 200, h: 44, titleTop: false,
+      pins: [
+        { id: "b2_3", rx: 138, ry: 15, short: "3", label: "3", info: "Entrada NA Botão Anti-Horário" },
+        { id: "b2_4", rx: 138, ry: 33, short: "4", label: "4", info: "Saída NA Botão Anti-Horário" }
+      ]
+    },
+    { id: "boia_sup", name: "Chave Boia Superior / Poço", desc: "Azul (Comum) · Preto (NA Encher) · Marrom (NF Esvaziar)", x: 25, y: 465, w: 255, h: 95, titleTop: true,
+      pins: [
+        { id: "bs_azul", rx: 24, ry: 44, short: "AZ", label: "AZUL (COM)", info: "Fio Azul: Comum da Chave Boia" },
+        { id: "bs_preto", rx: 130, ry: 44, short: "PT", label: "PRETO (NA)", info: "Fio Preto: Fecha quando baixa (encher caixa)" },
+        { id: "bs_marrom", rx: 24, ry: 76, short: "MR", label: "MARROM (NF)", info: "Fio Marrom: Fecha quando sobe (esvaziar poço)" }
+      ]
+    },
+    { id: "boia_inf", name: "Chave Boia Cisterna (Anti-Seco)", desc: "Azul (Comum) · Marrom (NF Proteção contra trabalho a seco)", x: 295, y: 465, w: 240, h: 95, titleTop: true,
+      pins: [
+        { id: "bi_azul", rx: 24, ry: 44, short: "AZ", label: "AZUL (COM)", info: "Fio Azul: Comum da Boia Cisterna" },
+        { id: "bi_marrom", rx: 24, ry: 76, short: "MR", label: "MARROM (NF)", info: "Fio Marrom: Mantém fechado enquanto há água" },
+        { id: "bi_preto", rx: 130, ry: 76, short: "PT", label: "PRETO (NA)", info: "Fio Preto (não usar para anti-seco)" }
+      ]
+    },
+    { id: "motor_3f", name: "Motor / Bomba Trifásica", desc: "Bornes de força U1, V1, W1", x: 550, y: 465, w: 135, h: 95, titleTop: true,
+      pins: [
+        { id: "m_u1", rx: 24, ry: 44, short: "U1", label: "U1", info: "Borne U1 do Motor Trifásico" },
+        { id: "m_v1", rx: 24, ry: 64, short: "V1", label: "V1", info: "Borne V1 do Motor Trifásico" },
+        { id: "m_w1", rx: 24, ry: 84, short: "W1", label: "W1", info: "Borne W1 do Motor Trifásico" }
+      ]
+    },
+    { id: "sinaleiro", name: "Sinaleiro Falha (X1/X2)", desc: "Indicador luminoso de desarme térmico", x: 695, y: 465, w: 105, h: 95, titleTop: true,
+      pins: [
+        { id: "sin_x1", rx: 24, ry: 48, short: "X1", label: "X1", info: "Entrada Fase Sinalização" },
+        { id: "sin_x2", rx: 24, ry: 78, short: "X2", label: "X2", info: "Retorno Neutro/Fase Sinalização" }
+      ]
+    }
+  ];
+
+  const BENCH_CIRCUITS = {
+    ind_poco_380_full: {
+      name: "1. Drenagem Poço 380V (Disj. 63A + RFF + Seletora + Boia + Contator + RT)",
+      shortName: "1. Drenagem Poço 380V",
+      compIds: ["dj63", "rff", "cont380", "rt", "sel", "boia_sup", "motor_3f"],
+      wires: [
+        { from: "dj63_2", to: "c380_l1", color: "#ef4444", label: "1. Ligue L1 (Borne 2 do Disj. 63A) na entrada L1 do Contator 380V." },
+        { from: "dj63_4", to: "c380_l2", color: "#f97316", label: "2. Ligue L2 (Borne 4 do Disj. 63A) na entrada L2 do Contator 380V." },
+        { from: "dj63_6", to: "c380_l3", color: "#eab308", label: "3. Ligue L3 (Borne 6 do Disj. 63A) na entrada L3 do Contator 380V." },
+        { from: "dj63_2", to: "rff_l1", color: "#ef4444", label: "4. Alimente L1 do Relé Falta de Fase a partir do borne 2 do Disj. 63A." },
+        { from: "dj63_4", to: "rff_l2", color: "#f97316", label: "5. Alimente L2 do Relé Falta de Fase a partir do borne 4 do Disj. 63A." },
+        { from: "dj63_6", to: "rff_l3", color: "#eab308", label: "6. Alimente L3 do Relé Falta de Fase a partir do borne 6 do Disj. 63A." },
+        { from: "dj63_2", to: "rff_15", color: "#ef4444", label: "7. Leve a Fase L1 (Borne 2) ao contato comum 15 do Relé Falta de Fase." },
+        { from: "rff_18", to: "sel_1", color: "#22c55e", label: "8. Ligue a saída 18 do Relé Falta de Fase no borne 1 (Comum) da Chave Seletora." },
+        { from: "sel_4", to: "bs_azul", color: "#22c55e", label: "9. Ligue a posição 4 (AUT) da Seletora no Fio AZUL (Comum) da Chave Boia." },
+        { from: "bs_marrom", to: "c380_a1", color: "#22c55e", label: "10. Ligue o Fio MARROM (NF) da Boia no borne A1 da Bobina 380V.",
+          errRules: { "bs_preto": "Use o Fio MARROM (NF) para drenagem de nível crítico! O Preto abriria quando o poço enchesse." } },
+        { from: "dj63_4", to: "rt_95", color: "#f97316", label: "11. Leve a 2ª Fase (L2 do Borne 4) ao contato 95 (NF) do Relé Térmico." },
+        { from: "rt_96", to: "c380_a2", color: "#f97316", label: "12. Ligue a saída 96 (NF) do Relé Térmico no borne A2 da Bobina 380V." },
+        { from: "rt_t1", to: "m_u1", color: "#ef4444", label: "13. Ligue a saída T1 do Relé Térmico ao terminal U1 da Bomba Submersa." },
+        { from: "rt_t2", to: "m_v1", color: "#f97316", label: "14. Ligue a saída T2 do Relé Térmico ao terminal V1 da Bomba Submersa." },
+        { from: "rt_t3", to: "m_w1", color: "#eab308", label: "15. Ligue a saída T3 do Relé Térmico ao terminal W1 da Bomba Submersa." }
+      ]
+    },
+
+    cisterna_caixa_220: {
+      name: "2. Predial 220V: Cisterna + Caixa Superior (Anti-Seco + Relé Térmico)",
+      shortName: "2. Cisterna + Caixa 220V",
+      compIds: ["dj220", "cont220", "rt", "boia_inf", "boia_sup"],
+      wires: [
+        { from: "dj220_2", to: "c220_l1", color: "#ef4444", label: "1. Ligue a Fase 220V (Borne 2 do Disjuntor) na entrada L1 do Contator." },
+        { from: "c220_l1", to: "c220_a1", color: "#ef4444", label: "2. Faça o jumper da Fase de L1 para o borne A1 da Bobina 220V." },
+        { from: "dj220_4", to: "c220_l2", color: "#3b82f6", label: "3. Ligue o Neutro (Borne 4 do Disjuntor) na entrada L2 do Contator." },
+        { from: "dj220_4", to: "bi_azul", color: "#3b82f6", label: "4. Leve o Neutro (Borne 4) ao Fio AZUL (Comum) da Boia Inferior (Cisterna)." },
+        { from: "bi_marrom", to: "bs_azul", color: "#f59e0b", label: "5. Interligue o Fio MARROM (NF) da Cisterna no Fio AZUL (Comum) da Boia Superior.",
+          errRules: { "bi_preto": "PERIGO! Na Cisterna use o Fio MARROM (NF) para cortar a bomba se a cisterna secar!" } },
+        { from: "bs_preto", to: "rt_95", color: "#22c55e", label: "6. Ligue o Fio PRETO (NA) da Caixa Superior no borne 95 (NF) do Relé Térmico.",
+          errRules: { "bs_marrom": "Na Caixa Superior use o Fio PRETO (NA) para não transbordar!" } },
+        { from: "rt_96", to: "c220_a2", color: "#22c55e", label: "7. Ligue a saída 96 (NF) do Relé Térmico no borne A2 da Bobina 220V." }
+      ]
+    },
+
+    cmd_110_selo: {
+      name: "3. Comando 110V (127V): Contator 110V + Selo (13-14) + Sinaleiro + RT",
+      shortName: "3. Comando 110V + Selo",
+      compIds: ["dj110", "b0", "b1", "cont110", "rt", "sinaleiro"],
+      wires: [
+        { from: "dj110_2", to: "rt_95", color: "#ef4444", label: "1. Ligue a Fase 127V (Borne 2) na entrada 95 (NF) do Relé Térmico." },
+        { from: "rt_96", to: "b0_1", color: "#ef4444", label: "2. Ligue a saída 96 do Relé Térmico na entrada 1 do Botão Desliga (NF)." },
+        { from: "b0_2", to: "b1_3", color: "#ef4444", label: "3. Ligue a saída 2 do Botão Desliga na entrada 3 do Botão Liga (NA)." },
+        { from: "b1_4", to: "c110_a1", color: "#22c55e", label: "4. Ligue a saída 4 do Botão Liga no borne A1 da Bobina 110V." },
+        { from: "b0_2", to: "c110_13", color: "#f59e0b", label: "5. Contato de Selo: ligue a saída 2 do Botão Desliga no borne 13 (NA) do Contator." },
+        { from: "c110_14", to: "c110_a1", color: "#f59e0b", label: "6. Feche o selo: ligue o borne 14 (NA) do Contator no borne A1 da Bobina 110V." },
+        { from: "dj110_4", to: "c110_a2", color: "#3b82f6", label: "7. Ligue o Neutro (Borne 4) no borne A2 da Bobina 110V." },
+        { from: "dj110_2", to: "rt_97", color: "#ef4444", label: "8. Alarme Térmico: leve Fase 127V (Borne 2) ao contato 97 (NA) do Relé Térmico." },
+        { from: "rt_98", to: "sin_x1", color: "#f59e0b", label: "9. Ligue a saída 98 (NA) do Relé Térmico ao borne X1 do Sinaleiro de Falha." },
+        { from: "dj110_4", to: "sin_x2", color: "#3b82f6", label: "10. Ligue o Neutro (Borne 4) no borne X2 do Sinaleiro de Falha." }
+      ]
+    },
+
+    res_boia_220: {
+      name: "4. Predial 220V: Contator Bobina 220V + Relé Térmico + Boia 3 Fios",
+      shortName: "4. Predial 220V Boia",
+      compIds: ["dj220", "cont220", "rt", "boia_sup"],
+      wires: [
+        { from: "dj220_2", to: "c220_l1", color: "#ef4444", label: "1. Ligue a Fase 220V (Borne 2) na entrada L1 do Contator." },
+        { from: "c220_l1", to: "c220_a1", color: "#ef4444", label: "2. Faça o jumper de L1 para o borne A1 da Bobina 220V." },
+        { from: "dj220_4", to: "c220_l2", color: "#3b82f6", label: "3. Ligue o Neutro (Borne 4) na entrada L2 do Contator." },
+        { from: "dj220_4", to: "bs_azul", color: "#3b82f6", label: "4. Leve o Neutro (Borne 4) ao Fio AZUL (Comum) da Chave Boia." },
+        { from: "bs_preto", to: "rt_95", color: "#22c55e", label: "5. Ligue o Fio PRETO (NA) da Boia no borne 95 (NF) do Relé Térmico." },
+        { from: "rt_96", to: "c220_a2", color: "#22c55e", label: "6. Ligue a saída 96 (NF) do Relé Térmico no borne A2 da Bobina 220V." }
+      ]
+    },
+
+    reversao_motor_3f: {
+      name: "5. Partida com Reversão Trifásica (K1 Horário + K2 Anti-Horário + Intertravamento)",
+      shortName: "5. Reversão K1/K2 3Ø",
+      compIds: ["dj63", "b0", "b1", "b2", "cont_k1", "cont_k2", "rt", "motor_3f"],
+      wires: [
+        { from: "dj63_2", to: "k1_l1", color: "#ef4444", label: "1. Potência K1: ligue L1 (Borne 2 do Disj. 63A) em L1 de K1." },
+        { from: "dj63_4", to: "k1_l2", color: "#f97316", label: "2. Potência K1: ligue L2 (Borne 4 do Disj. 63A) em L2 de K1." },
+        { from: "dj63_6", to: "k1_l3", color: "#eab308", label: "3. Potência K1: ligue L3 (Borne 6 do Disj. 63A) em L3 de K1." },
+        { from: "dj63_6", to: "k2_l1", color: "#eab308", label: "4. Inversão K2: ligue L3 (Borne 6) na entrada L1 de K2 (inverte L1 ↔ L3)." },
+        { from: "dj63_4", to: "k2_l2", color: "#f97316", label: "5. Potência K2: mantenha L2 (Borne 4) na entrada L2 de K2." },
+        { from: "dj63_2", to: "k2_l3", color: "#ef4444", label: "6. Inversão K2: ligue L1 (Borne 2) na entrada L3 de K2 para girar anti-horário." },
+        { from: "dj63_2", to: "rt_95", color: "#ef4444", label: "7. Comando: leve Fase L1 (Borne 2) ao contato 95 (NF) do Relé Térmico." },
+        { from: "rt_96", to: "b0_1", color: "#ef4444", label: "8. Ligue a saída 96 do Relé Térmico na entrada 1 do Botão Desliga (NF)." },
+        { from: "b0_2", to: "b1_3", color: "#22c55e", label: "9. Ligue a saída 2 do Botão Desliga na entrada 3 do Botão Horário (K1)." },
+        { from: "b1_4", to: "k2_21", color: "#22c55e", label: "10. Intertravamento K1: ligue saída 4 do Botão Horário no borne 21 (NF) de K2.",
+          errRules: { "k1_a1": "PERIGO! Passe pelo contato 21-22 (NF) de K2 antes de A1 de K1 para evitar curto entre fases!" } },
+        { from: "k2_22", to: "k1_a1", color: "#22c55e", label: "11. Ligue a saída 22 (NF) de K2 no borne A1 da Bobina K1." },
+        { from: "b0_2", to: "k1_13", color: "#38bdf8", label: "12. Selo K1: ligue saída 2 do Botão Desliga no borne 13 (NA) de K1." },
+        { from: "k1_14", to: "b1_4", color: "#38bdf8", label: "13. Feche selo K1: ligue borne 14 (NA) de K1 à saída 4 do Botão Horário (antes de 21-22)." },
+        { from: "b0_2", to: "b2_3", color: "#a855f7", label: "14. Ligue saída 2 do Botão Desliga na entrada 3 do Botão Anti-Horário (K2)." },
+        { from: "b2_4", to: "k1_21", color: "#a855f7", label: "15. Intertravamento K2: ligue saída 4 do Botão Anti-Horário no borne 21 (NF) de K1.",
+          errRules: { "k2_a1": "PERIGO! Passe pelo contato 21-22 (NF) de K1 antes de A1 de K2!" } },
+        { from: "k1_22", to: "k2_a1", color: "#a855f7", label: "16. Ligue a saída 22 (NF) de K1 no borne A1 da Bobina K2." },
+        { from: "b0_2", to: "k2_13", color: "#38bdf8", label: "17. Selo K2: ligue saída 2 do Botão Desliga no borne 13 (NA) de K2." },
+        { from: "k2_14", to: "b2_4", color: "#38bdf8", label: "18. Feche selo K2: ligue borne 14 (NA) de K2 à saída 4 do Botão Anti-Horário." },
+        { from: "dj63_4", to: "k1_a2", color: "#f97316", label: "19. Retorno Bobina K1: ligue Fase L2 (Borne 4) no borne A2 de K1." },
+        { from: "dj63_4", to: "k2_a2", color: "#f97316", label: "20. Retorno Bobina K2: ligue Fase L2 (Borne 4) no borne A2 de K2." },
+        { from: "rt_t1", to: "m_u1", color: "#ef4444", label: "21. Saída Motor: ligue T1 do Relé Térmico ao terminal U1 do Motor." },
+        { from: "rt_t2", to: "m_v1", color: "#f97316", label: "22. Saída Motor: ligue T2 do Relé Térmico ao terminal V1 do Motor." },
+        { from: "rt_t3", to: "m_w1", color: "#eab308", label: "23. Saída Motor: ligue T3 do Relé Térmico ao terminal W1 do Motor." }
+      ]
+    }
+  };
+
+  const EXAM_HISTORY_KEY = 'vivenzo_exam_history_v1';
+  function loadExamHistory() {
+    try {
+      const raw = localStorage.getItem(EXAM_HISTORY_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  }
+  let examHistory = loadExamHistory();
+  function saveExamHistory() {
+    try { localStorage.setItem(EXAM_HISTORY_KEY, JSON.stringify(examHistory)); } catch (e) {}
+  }
+
+  function recordExamCompletion() {
+    const circ = getCircuit();
+    const scoreNum = parseFloat(computeExamScore());
+    const techName = (document.getElementById('exam-tech-name').value || 'Colaborador em Avaliação').trim();
+    examHistory.unshift({
+      id: Date.now(),
+      techName: techName,
+      circuitKey: benchState.circuitKey,
+      circuitName: circ.shortName || circ.name,
+      score: scoreNum.toFixed(1),
+      approved: scoreNum >= 7.0,
+      timeStr: getExamElapsedText(),
+      errors: benchState.errors,
+      dateStr: new Date().toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
+    });
+    saveExamHistory();
+  }
+
+  function exportExamHistoryCSV() {
+    if (examHistory.length === 0) return;
+    const header = "Data/Hora;Tecnico;Circuito;Nota;Status;Tempo;Erros\n";
+    const rows = examHistory.map(function(h) {
+      return [
+        h.dateStr,
+        '"' + h.techName.replace(/"/g, '""') + '"',
+        '"' + h.circuitName.replace(/"/g, '""') + '"',
+        h.score.replace('.', ','),
+        h.approved ? "APROVADO" : "REPROVADO",
+        h.timeStr,
+        h.errors
+      ].join(';');
+    }).join('\n');
+    const blob = new Blob(["\uFEFF" + header + rows], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'historico-avaliacoes-vivenzo.csv';
+    a.click();
+  }
+
+  let benchState = {
+    circuitKey: "ind_poco_380_full",
+    mode: "train",
+    placedIds: [],
+    completedWires: [],
+    freeWires: [],
+    selectedPin: null,
+    attempts: 0,
+    errors: 0,
+    errorLogs: [],
+    examStartTime: null,
+    examEndTime: null,
+    examRecorded: false,
+    test: { djOn: true, cisternaOk: true, caixaPedindo: true, pocoCritico: false, rtTrip: false, seloAtivo: false, rffOk: true, selMode: "AUT", revDir: "OFF" }
+  };
+
+  function getCompById(id) { return ALL_BENCH_COMPONENTS.find(function(c) { return c.id === id; }); }
+  function getCircuit() { return BENCH_CIRCUITS[benchState.circuitKey]; }
+  function setBenchFeedback(text, type) {
+    const el = document.getElementById('bench-feedback');
+    el.textContent = text;
+    el.className = 'bench-feedback ' + (type || 'step');
+  }
+  function formatDuration(ms) {
+    const totalSec = Math.max(0, Math.floor(ms / 1000));
+    return String(Math.floor(totalSec / 60)).padStart(2, '0') + ':' + String(totalSec % 60).padStart(2, '0');
+  }
+  function getExamElapsedText() {
+    if (!benchState.examStartTime) return '00:00';
+    return formatDuration((benchState.examEndTime || Date.now()) - benchState.examStartTime);
+  }
+  function startExamTimerIfNeeded() {
+    if (benchState.mode === "exam" && !benchState.examStartTime) benchState.examStartTime = Date.now();
+  }
+  function computeExamScore() {
+    const totalWires = getCircuit().wires.length;
+    return Math.max(0, 10 - (benchState.errors * (10 / Math.max(4, totalWires)))).toFixed(1);
+  }
+
+  function evaluateBenchTest() {
+    const k = benchState.circuitKey;
+    const t = benchState.test;
+    let active = false;
+    let msg = "";
+
+    if (!t.djOn) {
+      msg = "Disjuntor desligado (0V). Ligue o disjuntor para energizar o painel.";
+    } else if (t.rtTrip) {
+      msg = "DESARME TÉRMICO (95-96 ABERTO / 97-98 FECHADO): Sobrecarga detectada! Contator desligado.";
+    } else if (benchState.mode === "free") {
+      active = benchState.freeWires.length > 0;
+      msg = active
+        ? ("BANCADA LIVRE ENERGIZADA: " + benchState.freeWires.length + " cabo(s) conectado(s).")
+        : "Conecte cabos entre os componentes fixados para testar a continuidade.";
+    } else if (k === "ind_poco_380_full") {
+      if (!t.rffOk) msg = "RELÉ FALTA DE FASE ATUADO (15-18 ABERTO): Falha nas fases bloqueou o comando!";
+      else if (t.selMode === "0") msg = "CHAVE SELETORA EM 0 (DESLIGADO): Circuito interrompido.";
+      else if (t.selMode === "MAN") { active = true; msg = "MODO MANUAL (2): Bomba submersa 380V ligada diretamente pela seletora!"; }
+      else {
+        active = t.pocoCritico;
+        msg = active ? "MODO AUTOMÁTICO (4) + NÍVEL CRÍTICO: Boia fechou Azul+Marrom (NF) e atracou o Contator 380V!" : "MODO AUTOMÁTICO (4): Aguardando nível crítico no poço.";
+      }
+    } else if (k === "cisterna_caixa_220") {
+      active = t.cisternaOk && t.caixaPedindo;
+      if (active) msg = "BOMBA LIGADA (220V): Cisterna com água (NF fechado) E Caixa Superior baixa (NA fechado).";
+      else if (!t.cisternaOk) msg = "BLOQUEIO ANTI-SECO ATUADO: Cisterna vazia abriu Azul+Marrom! Bomba protegida.";
+      else msg = "CAIXA SUPERIOR CHEIA: Boia superior abriu Azul+Preto. Bomba em repouso.";
+    } else if (k === "res_boia_220") {
+      active = t.caixaPedindo;
+      msg = active ? "MOTOBOMBA LIGADA (220V): Boia superior fechou Azul+Preto (NA)." : "RESERVATÓRIO CHEIO: Boia superior aberta.";
+    } else if (k === "cmd_110_selo") {
+      active = t.seloAtivo;
+      msg = active ? "CONTATOR ATRACADO (110V/127V): Contato auxiliar 13-14 mantendo o selo energizado!" : "COMANDO EM REPOUSO: Pressione 'Pulso Liga (3-4)' para atracar e selar.";
+    } else if (k === "reversao_motor_3f") {
+      active = (t.revDir === "K1" || t.revDir === "K2");
+      if (t.revDir === "K1") msg = "K1 ATRACADO (HORÁRIO ↻): L1-L2-L3 diretos. Contato 21-22 de K1 bloqueia K2 por intertravamento!";
+      else if (t.revDir === "K2") msg = "K2 ATRACADO (ANTI-HORÁRIO ↺): Fases L1↔L3 invertidas. Contato 21-22 de K2 bloqueia K1 por intertravamento!";
+      else msg = "MOTOR PARADO: Pressione 'Pulso Horário K1' ou 'Pulso Anti-Horário K2'.";
+    }
+    return { active: active, msg: msg };
+  }
+
+  function renderBenchTestPanel() {
+    const circ = getCircuit();
+    const isFree = benchState.mode === "free";
+    const isFinished = isFree
+      ? (benchState.placedIds.length >= 2 && benchState.freeWires.length >= 1)
+      : (benchState.completedWires.length === circ.wires.length);
+
+    const box = document.getElementById('bench-test-box');
+    if (!isFinished) { box.classList.remove('show'); return; }
+    box.classList.add('show');
+
+    const k = benchState.circuitKey;
+    const t = benchState.test;
+    const res = evaluateBenchTest();
+    const lamp = document.getElementById('bench-test-lamp');
+    if (k === "reversao_motor_3f" && res.active) {
+      lamp.textContent = t.revDir === "K1" ? '🟢 K1 HORÁRIO (↻) · INTERTRAVADO' : '🟢 K2 ANTI-HORÁRIO (↺) · INTERTRAVADO';
+    } else {
+      lamp.textContent = res.active ? '🟢 CONTATOR ATRACADO · CIRCUITO ATIVO' : (t.rtTrip ? '🔴 FALHA TÉRMICA (95-96 / 97-98)' : '⚪ REPOUSO / DESLIGADO');
+    }
+    lamp.className = 'test-lamp ' + (res.active ? 'running' : (t.rtTrip ? 'trip' : ''));
+    document.getElementById('bench-test-readout').textContent = res.msg;
+
+    let ctrlHTML = '<button type="button" id="tst-dj" class="btn ' + (t.djOn ? 'btn-green' : 'btn-red') + '">' + (t.djOn ? 'Disjuntor: ON' : 'Disjuntor: OFF') + '</button>';
+    if (!isFree) {
+      if (k === "ind_poco_380_full") {
+        ctrlHTML += '<button type="button" id="tst-rff" class="btn ' + (t.rffOk ? 'btn-blue' : 'btn-red') + '">' + (t.rffOk ? 'Fases L1/L2/L3: OK' : 'Simular Falta Fase') + '</button>';
+        ctrlHTML += '<button type="button" id="tst-sel" class="btn btn-amber">Seletora: ' + t.selMode + '</button>';
+        ctrlHTML += '<button type="button" id="tst-poco" class="btn ' + (t.pocoCritico ? 'btn-green' : 'btn-slate') + '">' + (t.pocoCritico ? 'Poço: Nível Crítico' : 'Poço: Nível Normal') + '</button>';
+      } else if (k === "cisterna_caixa_220") {
+        ctrlHTML += '<button type="button" id="tst-cist" class="btn ' + (t.cisternaOk ? 'btn-blue' : 'btn-amber') + '">' + (t.cisternaOk ? 'Cisterna: Com Água' : 'Cisterna: SECA') + '</button>';
+        ctrlHTML += '<button type="button" id="tst-caixa" class="btn ' + (t.caixaPedindo ? 'btn-blue' : 'btn-slate') + '">' + (t.caixaPedindo ? 'Caixa Sup.: Baixa' : 'Caixa Sup.: Cheia') + '</button>';
+      } else if (k === "res_boia_220") {
+        ctrlHTML += '<button type="button" id="tst-caixa" class="btn ' + (t.caixaPedindo ? 'btn-blue' : 'btn-slate') + '">' + (t.caixaPedindo ? 'Caixa Sup.: Baixa' : 'Caixa Sup.: Cheia') + '</button>';
+      } else if (k === "cmd_110_selo") {
+        ctrlHTML += '<button type="button" id="tst-b1" class="btn btn-green">Pulso Liga (3-4)</button>';
+        ctrlHTML += '<button type="button" id="tst-b0" class="btn btn-red">Pulso Desliga (1-2)</button>';
+      } else if (k === "reversao_motor_3f") {
+        ctrlHTML += '<button type="button" id="tst-rev-k1" class="btn ' + (t.revDir === "K1" ? 'btn-green' : 'btn-blue') + '">Pulso Horário K1 (↻)</button>';
+        ctrlHTML += '<button type="button" id="tst-rev-k2" class="btn ' + (t.revDir === "K2" ? 'btn-green' : 'btn-blue') + '">Pulso Anti-Horário K2 (↺)</button>';
+        ctrlHTML += '<button type="button" id="tst-rev-off" class="btn btn-red">Pulso Desliga (1-2)</button>';
+      }
+    }
+    ctrlHTML += '<button type="button" id="tst-rt" class="btn ' + (t.rtTrip ? 'btn-red' : 'btn-slate') + '">' + (t.rtTrip ? 'Reset Térmico' : 'Sobrecarga (95-96)') + '</button>';
+    document.getElementById('bench-test-controls').innerHTML = ctrlHTML;
+
+    document.getElementById('tst-dj').addEventListener('click', function() { t.djOn = !t.djOn; if (!t.djOn) { t.seloAtivo = false; t.revDir = "OFF"; } renderBench(); });
+    if (document.getElementById('tst-rff')) document.getElementById('tst-rff').addEventListener('click', function() { t.rffOk = !t.rffOk; renderBench(); });
+    if (document.getElementById('tst-sel')) document.getElementById('tst-sel').addEventListener('click', function() { t.selMode = (t.selMode === "AUT" ? "MAN" : (t.selMode === "MAN" ? "0" : "AUT")); renderBench(); });
+    if (document.getElementById('tst-cist')) document.getElementById('tst-cist').addEventListener('click', function() { t.cisternaOk = !t.cisternaOk; renderBench(); });
+    if (document.getElementById('tst-caixa')) document.getElementById('tst-caixa').addEventListener('click', function() { t.caixaPedindo = !t.caixaPedindo; renderBench(); });
+    if (document.getElementById('tst-poco')) document.getElementById('tst-poco').addEventListener('click', function() { t.pocoCritico = !t.pocoCritico; renderBench(); });
+    if (document.getElementById('tst-b1')) document.getElementById('tst-b1').addEventListener('click', function() { if (t.djOn && !t.rtTrip) t.seloAtivo = true; renderBench(); });
+    if (document.getElementById('tst-b0')) document.getElementById('tst-b0').addEventListener('click', function() { t.seloAtivo = false; renderBench(); });
+    if (document.getElementById('tst-rev-k1')) document.getElementById('tst-rev-k1').addEventListener('click', function() {
+      if (!t.djOn || t.rtTrip) return;
+      if (t.revDir === "K2") { setBenchFeedback('🔒 INTERTRAVAMENTO ATUADO: K2 está atracado e seu contato 21-22 (NF) impede ligar K1 sem antes pressionar Desliga!', 'error'); return; }
+      t.revDir = "K1"; renderBench();
+    });
+    if (document.getElementById('tst-rev-k2')) document.getElementById('tst-rev-k2').addEventListener('click', function() {
+      if (!t.djOn || t.rtTrip) return;
+      if (t.revDir === "K1") { setBenchFeedback('🔒 INTERTRAVAMENTO ATUADO: K1 está atracado e seu contato 21-22 (NF) impede ligar K2 sem antes pressionar Desliga!', 'error'); return; }
+      t.revDir = "K2"; renderBench();
+    });
+    if (document.getElementById('tst-rev-off')) document.getElementById('tst-rev-off').addEventListener('click', function() { t.revDir = "OFF"; renderBench(); });
+    document.getElementById('tst-rt').addEventListener('click', function() { t.rtTrip = !t.rtTrip; if (t.rtTrip) { t.seloAtivo = false; t.revDir = "OFF"; } renderBench(); });
+  }
+
+  function getNextPendingIndex(circ) {
+    for (let i = 0; i < circ.wires.length; i++) {
+      if (!benchState.completedWires.includes(i)) return i;
+    }
+    return -1;
+  }
+
+  function renderBench() {
+    const circ = getCircuit();
+    const isExam = benchState.mode === "exam";
+    const isFree = benchState.mode === "free";
+    const requiredIds = isFree ? [] : circ.compIds;
+    const allReqPlaced = isFree ? (benchState.placedIds.length >= 1) : requiredIds.every(function(id) { return benchState.placedIds.includes(id); });
+    const isFinished = !isFree && benchState.completedWires.length === circ.wires.length;
+    const testActive = evaluateBenchTest().active && (isFinished || (isFree && benchState.freeWires.length > 0));
+    const nextPendingIdx = getNextPendingIndex(circ);
+    const currentStepWire = (benchState.mode === "train" && allReqPlaced && nextPendingIdx !== -1) ? circ.wires[nextPendingIdx] : null;
+
+    const palette = document.getElementById('bench-comp-palette');
+    const rightDynamic = document.getElementById('bench-right-dynamic');
+    const svg = document.getElementById('bench-svg');
+    const hintBtn = document.getElementById('btn-bench-hint');
+    const autoStepBtn = document.getElementById('btn-auto-step');
+
+    document.getElementById('btn-cancel-pin').style.display = benchState.selectedPin ? 'inline-block' : 'none';
+    document.getElementById('mode-train-btn').classList.toggle('active', benchState.mode === "train");
+    document.getElementById('mode-exam-btn').classList.toggle('active', isExam);
+    document.getElementById('mode-free-btn').classList.toggle('active', isFree);
+    document.getElementById('exam-candidate-box').style.display = isExam ? 'block' : 'none';
+    document.getElementById('circuit-select-wrap').style.display = isFree ? 'none' : 'block';
+    document.getElementById('btn-place-required').style.display = isFree ? 'none' : 'inline-block';
+
+    hintBtn.disabled = isExam || isFree;
+    hintBtn.textContent = isExam ? '🔒 Sem Dicas' : (isFree ? '⚡ Livre' : '💡 Dica');
+    autoStepBtn.style.display = (benchState.mode === "train") ? 'inline-block' : 'none';
+    autoStepBtn.disabled = isFinished;
+
+    document.getElementById('right-panel-title').textContent = isExam
+      ? '3. Boletim & Histórico de Provas'
+      : (isFree ? '3. Cabos Conectados (Bancada Livre)' : '3. Sequência Correta de Ligação');
+
+    palette.innerHTML = '';
+    ALL_BENCH_COMPONENTS.forEach(function(comp) {
+      const isPlaced = benchState.placedIds.includes(comp.id);
+      const isReq = requiredIds.includes(comp.id);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'comp-item-btn' + (isPlaced ? ' placed' : '') + (isReq ? ' required' : '');
+      const tagText = isPlaced ? '✓ No Trilho' : (isReq ? '★ Necessário' : '+ Fixar');
+      const tagClass = isPlaced ? 'badge-on' : (isReq ? 'badge-info' : 'badge-warn');
+      btn.innerHTML = '<div><strong>' + comp.name + '</strong><small>' + comp.desc + '</small></div><span class="badge ' + tagClass + '">' + tagText + '</span>';
+      btn.addEventListener('click', function() {
+        if (!isPlaced) {
+          startExamTimerIfNeeded();
+          benchState.placedIds.push(comp.id);
+          if (isFree) setBenchFeedback('"' + comp.name + '" fixado! Clique em dois bornes quaisquer na bancada para lançar um cabo.', 'step');
+          else {
+            const nowAll = requiredIds.every(function(id) { return benchState.placedIds.includes(id); });
+            setBenchFeedback(nowAll
+              ? (isExam ? 'PROVA INICIADA: Cronômetro rodando! Conecte os bornes sem ajuda.' : 'Componentes fixados! Siga o Passo 1 clicando nos bornes destacados em dourado.')
+              : ('"' + comp.name + '" fixado! Fixe os componentes marcados com ★ Necessário.'), nowAll ? 'success' : 'step');
+          }
+          renderBench();
+        } else if (isFree) {
+          benchState.placedIds = benchState.placedIds.filter(function(x) { return x !== comp.id; });
+          renderBench();
+        }
+      });
+      palette.appendChild(btn);
+    });
+
+    if (isFree) {
+      let freeHTML = '<h4>🔌 Ligações Realizadas (' + benchState.freeWires.length + ')</h4>';
+      if (benchState.freeWires.length === 0) freeHTML += '<p style="color:var(--muted); font-size:0.78rem;">Fixe qualquer componente dos 18 disponíveis e toque em dois bornes.</p>';
+      else benchState.freeWires.forEach(function(fw, idx) { freeHTML += '<div class="pin-row"><span class="pin-badge">Cabo ' + (idx + 1) + '</span><div style="font-size:0.77rem;">' + fw.label + '</div></div>'; });
+      rightDynamic.innerHTML = freeHTML;
+    } else if (!isExam) {
+      let html = '<h4>📋 Sequência Correta de Ligação</h4><div>';
+      circ.wires.forEach(function(w, idx) {
+        const done = benchState.completedWires.includes(idx);
+        const isCurrent = !done && idx === nextPendingIdx && allReqPlaced;
+        html += '<div class="pin-row" style="opacity:' + (done ? '0.65' : '1') + ';"><span class="pin-badge" style="color:' + (done ? '#22c55e' : (isCurrent ? '#f59e0b' : '#94a3b8')) + ';">' + (done ? '✓ OK' : 'Passo ' + (idx + 1)) + '</span><div style="font-size:0.77rem;' + (isCurrent ? 'color:#fde68a;font-weight:700;' : '') + '">' + w.label + '</div></div>';
+      });
+      rightDynamic.innerHTML = html + '</div>';
+    } else {
+      const score = computeExamScore();
+      const approved = parseFloat(score) >= 7.0;
+      const techName = (document.getElementById('exam-tech-name').value || 'Colaborador em Avaliação').trim();
+      let examHTML = '<div class="scorecard"><div style="display:flex; justify-content:space-between; align-items:center;"><strong style="color:var(--amber); font-size:0.85rem;">🎓 AVALIAÇÃO TÉCNICA</strong><span class="badge ' + (isFinished ? (approved ? 'badge-on' : 'badge-off') : 'badge-warn') + '">' + (isFinished ? (approved ? 'APROVADO' : 'REPROVADO') : 'EM ANDAMENTO') + '</span></div>';
+      examHTML += '<div style="font-size:0.78rem; color:#cbd5e1; margin-top:4px;">Técnico: <strong>' + techName + '</strong></div>';
+      examHTML += '<div class="score-big" style="color:' + (approved ? '#22c55e' : '#ef4444') + ';">Nota: ' + score + ' / 10,0</div>';
+      examHTML += '<div class="score-grid"><div class="score-cell">Acertos<strong style="color:#22c55e;">' + benchState.completedWires.length + '/' + circ.wires.length + '</strong></div><div class="score-cell">Erros<strong style="color:#ef4444;">' + benchState.errors + '</strong></div><div class="score-cell">Tempo<strong id="exam-timer-val" style="color:#38bdf8;">' + getExamElapsedText() + '</strong></div></div></div>';
+      if (benchState.errorLogs.length > 0) {
+        examHTML += '<h4 style="margin-top:10px; color:#fca5a5; font-size:0.82rem;">⚠️ Registro de Falhas:</h4>';
+        benchState.errorLogs.forEach(function(errTxt) { examHTML += '<div class="pin-row" style="font-size:0.75rem; color:#fecaca;">• ' + errTxt + '</div>'; });
+      }
+      examHTML += '<div class="history-header"><strong style="font-size:0.82rem; color:#38bdf8;">🏆 Histórico (' + examHistory.length + ')</strong><div style="display:flex; gap:4px;">' + (examHistory.length > 0 ? '<button type="button" id="btn-export-csv" class="btn btn-blue" style="padding:3px 7px; font-size:0.69rem;">📊 CSV</button><button type="button" id="btn-clear-history" class="btn btn-slate" style="padding:3px 7px; font-size:0.69rem;">Limpar</button>' : '') + '</div></div>';
+      if (examHistory.length === 0) examHTML += '<p style="color:var(--muted); font-size:0.75rem; margin-top:6px;">Nenhuma prova concluída salva ainda.</p>';
+      else examHistory.forEach(function(h) {
+        examHTML += '<div class="history-item"><div class="history-item-top"><strong style="color:#f8fafc;">' + h.techName + '</strong><span class="badge ' + (h.approved ? 'badge-on' : 'badge-off') + '" style="font-size:0.66rem; padding:2px 6px;">' + h.score + ' · ' + (h.approved ? 'APROV.' : 'REPROV.') + '</span></div><div style="color:#cbd5e1; font-size:0.72rem;">' + h.circuitName + '</div><div class="history-meta"><span>⏱️ ' + h.timeStr + '</span><span>❌ ' + h.errors + ' erro(s)</span><span>📅 ' + h.dateStr + '</span></div></div>';
+      });
+      rightDynamic.innerHTML = examHTML;
+      if (document.getElementById('btn-export-csv')) document.getElementById('btn-export-csv').addEventListener('click', exportExamHistoryCSV);
+      if (document.getElementById('btn-clear-history')) document.getElementById('btn-clear-history').addEventListener('click', function() { examHistory = []; saveExamHistory(); renderBench(); });
+    }
+
+    const progBadge = document.getElementById('bench-progress-badge');
+    if (isFree) { progBadge.textContent = benchState.placedIds.length + ' Peças · ' + benchState.freeWires.length + ' Cabos'; progBadge.className = 'badge badge-on'; }
+    else if (!allReqPlaced) { progBadge.textContent = 'Fixando: ' + requiredIds.filter(function(id) { return benchState.placedIds.includes(id); }).length + '/' + requiredIds.length; progBadge.className = 'badge badge-info'; }
+    else if (!isFinished) { progBadge.textContent = (isExam ? 'Prova: ' : 'Fiação: ') + benchState.completedWires.length + '/' + circ.wires.length; progBadge.className = 'badge badge-warn'; }
+    else { progBadge.textContent = isExam ? ('Nota: ' + computeExamScore() + ' (' + getExamElapsedText() + ')') : '100% Montado!'; progBadge.className = 'badge badge-on'; }
+
+    let svgHTML = '<rect x="0" y="0" width="820" height="580" fill="#070b14"/>';
+    svgHTML += '<text x="16" y="20" fill="#38bdf8" font-size="10.5" font-weight="800">' + (isFree ? 'BANCADA LIVRE VIVENZO · MONTAGEM CUSTOMIZADA' : circ.name) + '</text>';
+    [68, 220, 362, 498].forEach(function(ry) { svgHTML += '<rect x="15" y="' + ry + '" width="790" height="14" rx="3" fill="#1e293b" stroke="#475569"/>'; });
+
+    const pinCoords = {};
+    benchState.placedIds.forEach(function(compId) {
+      const comp = getCompById(compId);
+      if (comp) comp.pins.forEach(function(p) { pinCoords[p.id] = { x: comp.x + p.rx, y: comp.y + p.ry, info: p.info, label: p.label, compName: comp.name }; });
+    });
+
+    const activeWireList = isFree ? benchState.freeWires : benchState.completedWires.map(function(wIdx) { return circ.wires[wIdx]; });
+    activeWireList.forEach(function(w, idx) {
+      const p1 = pinCoords[w.from], p2 = pinCoords[w.to];
+      if (p1 && p2) {
+        const midY = (p1.y + p2.y) / 2 + ((idx % 4) - 1.5) * 12;
+        svgHTML += '<path d="M ' + p1.x + ' ' + p1.y + ' L ' + p1.x + ' ' + midY + ' L ' + p2.x + ' ' + midY + ' L ' + p2.x + ' ' + p2.y + '" stroke="' + w.color + '" stroke-width="' + (testActive ? '4' : '2.8') + '" fill="none" stroke-linecap="round"/>';
+      }
+    });
+
+    benchState.placedIds.forEach(function(compId) {
+      const comp = getCompById(compId);
+      if (!comp) return;
+      const isContactor = comp.id.startsWith('cont');
+      let contEngaged = testActive;
+      if (benchState.circuitKey === "reversao_motor_3f") {
+        if (comp.id === "cont_k1") contEngaged = (benchState.test.revDir === "K1" && benchState.test.djOn && !benchState.test.rtTrip);
+        else if (comp.id === "cont_k2") contEngaged = (benchState.test.revDir === "K2" && benchState.test.djOn && !benchState.test.rtTrip);
+      }
+      const strokeCol = (isContactor && contEngaged) ? '#22c55e' : '#94a3b8';
+      const titleY = comp.titleTop ? (comp.y + 16) : (comp.y + comp.h / 2 + 3);
+      svgHTML += '<rect x="' + comp.x + '" y="' + comp.y + '" width="' + comp.w + '" height="' + comp.h + '" rx="8" fill="#1e293b" stroke="' + strokeCol + '" stroke-width="' + ((isContactor && contEngaged) ? '2.8' : '1.8') + '"/>';
+      svgHTML += '<text class="pin-label-txt" x="' + (comp.x + 10) + '" y="' + titleY + '" fill="#f8fafc" font-size="9.2" font-weight="800">' + comp.name + '</text>';
+      if (isContactor && (isFinished || isFree)) {
+        svgHTML += '<text class="pin-label-txt" x="' + (comp.x + 10) + '" y="' + (titleY + 13) + '" fill="' + (contEngaged ? '#4ade80' : '#94a3b8') + '" font-size="8" font-weight="800">' + (contEngaged ? '● BOBINA ATRACADA' : '○ REPOUSO') + '</text>';
+      }
+      comp.pins.forEach(function(p) {
+        const cx = comp.x + p.rx, cy = comp.y + p.ry;
+        const isSel = benchState.selectedPin === p.id;
+        const isDone = activeWireList.some(function(w) { return w.from === p.id || w.to === p.id; });
+        const isTargetStep = currentStepWire && (currentStepWire.from === p.id || currentStepWire.to === p.id);
+        svgHTML += '<g class="pin-hotspot' + (isSel ? ' pin-selected' : '') + '" data-pin="' + p.id + '"><circle cx="' + cx + '" cy="' + cy + '" r="15" fill="transparent"/>';
+        if (isTargetStep) svgHTML += '<circle class="pin-target-ring" cx="' + cx + '" cy="' + cy + '" r="11.5"/>';
+        if (isSel) svgHTML += '<circle cx="' + cx + '" cy="' + cy + '" r="12" fill="none" stroke="#f59e0b" stroke-width="2.5"/>';
+        svgHTML += '<circle class="pin-dot" cx="' + cx + '" cy="' + cy + '" r="7.5" fill="' + (isSel ? '#f59e0b' : (isDone ? '#22c55e' : '#38bdf8')) + '" stroke="#0f172a" stroke-width="1.6"/>';
+        svgHTML += '<text class="pin-label-txt" x="' + cx + '" y="' + (cy + 2.5) + '" text-anchor="middle" fill="#0f172a" font-size="6.4" font-family="monospace" font-weight="900">' + p.short + '</text></g>';
+        svgHTML += '<text class="pin-label-txt" x="' + (cx + 11) + '" y="' + (cy + 3) + '" fill="' + (isTargetStep ? '#fde047' : '#e2e8f0') + '" font-size="8.4" font-family="monospace" font-weight="800">' + p.label + '</text>';
+      });
+    });
+
+    svg.innerHTML = svgHTML;
+    svg.querySelectorAll('.pin-hotspot').forEach(function(el) {
+      el.addEventListener('click', function(ev) { ev.stopPropagation(); handlePinClick(this.getAttribute('data-pin'), pinCoords); });
+    });
+    renderBenchTestPanel();
+  }
+
+  function handlePinClick(pinId, pinCoords) {
+    const circ = getCircuit();
+    const isExam = benchState.mode === "exam";
+    const isFree = benchState.mode === "free";
+    const pData = pinCoords[pinId];
+    if (!pData) return;
+
+    const shortComp = pData.compName.replace(/^[0-9A-Z]+\.\s*/, '');
+    document.getElementById('bench-inspector').innerHTML = '<h4>🔌 Borne: ' + pData.label + '</h4><p style="color:var(--accent); font-weight:700; margin-bottom:4px;">' + pData.compName + '</p><p style="color:#e2e8f0;">' + (isExam ? 'Modo Avaliação: função oculta.' : pData.info) + '</p>';
+
+    if (!isFree) {
+      if (!circ.compIds.every(function(id) { return benchState.placedIds.includes(id); })) { setBenchFeedback('Fixe todos os componentes marcados com ★ Necessário antes de iniciar a fiação!', 'error'); return; }
+      if (benchState.completedWires.length >= circ.wires.length) { setBenchFeedback('Circuito 100% montado! Use o painel de Teste Energizado logo abaixo.', 'success'); return; }
+    }
+
+    startExamTimerIfNeeded();
+    const selBadge = document.getElementById('bench-selected-pin');
+    if (!benchState.selectedPin) {
+      benchState.selectedPin = pinId;
+      selBadge.textContent = 'Origem: ' + shortComp + ' [' + pData.label + ']';
+      setBenchFeedback('Origem selecionada: ' + shortComp + ' [' + pData.label + ']. Clique no borne de DESTINO.', 'step');
+      renderBench(); return;
+    }
+    if (benchState.selectedPin === pinId) {
+      benchState.selectedPin = null; selBadge.textContent = 'Nenhum borne';
+      setBenchFeedback('Seleção cancelada.', 'step'); renderBench(); return;
+    }
+
+    const fromPin = benchState.selectedPin, toPin = pinId;
+    const fromLabelFull = pinCoords[fromPin].compName.replace(/^[0-9A-Z]+\.\s*/, '') + ' [' + pinCoords[fromPin].label + ']';
+    const toLabelFull = shortComp + ' [' + pData.label + ']';
+
+    if (isFree) {
+      const colors = ["#ef4444", "#f97316", "#eab308", "#3b82f6", "#22c55e", "#a855f7"];
+      const lbl = fromLabelFull + ' → ' + toLabelFull;
+      benchState.freeWires.push({ from: fromPin, to: toPin, color: colors[benchState.freeWires.length % colors.length], label: lbl });
+      benchState.selectedPin = null; selBadge.textContent = 'Nenhum borne';
+      setBenchFeedback('Cabo conectado: ' + lbl, 'success'); renderBench(); return;
+    }
+
+    let matchedIdx = -1;
+    for (let i = 0; i < circ.wires.length; i++) {
+      if (benchState.completedWires.includes(i)) continue;
+      if ((fromPin === circ.wires[i].from && toPin === circ.wires[i].to) || (fromPin === circ.wires[i].to && toPin === circ.wires[i].from)) { matchedIdx = i; break; }
+    }
+
+    benchState.attempts++;
+    if (matchedIdx !== -1) {
+      benchState.completedWires.push(matchedIdx);
+      benchState.selectedPin = null; selBadge.textContent = 'Nenhum borne';
+      const nextIdx = getNextPendingIndex(circ);
+      if (nextIdx === -1) {
+        if (isExam && !benchState.examEndTime) benchState.examEndTime = Date.now();
+        if (isExam && !benchState.examRecorded) { benchState.examRecorded = true; recordExamCompletion(); }
+        setBenchFeedback(isExam
+          ? ('PROVA FINALIZADA! Nota: ' + computeExamScore() + '/10,0 | Tempo: ' + getExamElapsedText() + ' | Erros: ' + benchState.errors + '.')
+          : 'PARABÉNS! Montagem concluída! Teste o circuito energizado abaixo.', 'success');
+      } else {
+        setBenchFeedback(isExam ? ('Ligação ' + benchState.completedWires.length + '/' + circ.wires.length + ' aceita!') : ('✓ Conectado: ' + fromLabelFull + ' → ' + toLabelFull + ' | Próximo: ' + circ.wires[nextIdx].label), 'success');
+      }
+    } else {
+      const expected = circ.wires[getNextPendingIndex(circ)];
+      benchState.errors++;
+      const customErr = (expected && expected.errRules) ? (expected.errRules[toPin] || expected.errRules[fromPin]) : null;
+      benchState.errorLogs.push(fromLabelFull + ' → ' + toLabelFull + (customErr ? (' (' + customErr + ')') : ''));
+      setBenchFeedback(isExam
+        ? ('ERRO REGISTRADO: ' + fromLabelFull + ' → ' + toLabelFull + '.' + (customErr ? (' ' + customErr) : ''))
+        : ('✗ Você conectou: ' + fromLabelFull + ' → ' + toLabelFull + '. ' + (customErr || ('Passo esperado: ' + expected.label))), 'error');
+      benchState.selectedPin = null; selBadge.textContent = 'Nenhum borne';
+    }
+    renderBench();
+  }
+
+  document.getElementById('btn-cancel-pin').addEventListener('click', function() { benchState.selectedPin = null; document.getElementById('bench-selected-pin').textContent = 'Nenhum borne'; renderBench(); });
+  document.getElementById('btn-auto-step').addEventListener('click', function() {
+    if (benchState.mode !== "train") return;
+    const circ = getCircuit();
+    if (!circ.compIds.every(function(id) { return benchState.placedIds.includes(id); })) {
+      circ.compIds.forEach(function(id) { if (!benchState.placedIds.includes(id)) benchState.placedIds.push(id); });
+      setBenchFeedback('⚡ Componentes fixados automaticamente! Clique novamente para auto-conectar cada passo.', 'success');
+      renderBench(); return;
+    }
+    const nextIdx = getNextPendingIndex(circ);
+    if (nextIdx === -1) return;
+    benchState.completedWires.push(nextIdx);
+    const afterIdx = getNextPendingIndex(circ);
+    setBenchFeedback(afterIdx === -1 ? '⚡ Circuito 100% montado!' : ('⚡ Auto-conectado: ' + circ.wires[nextIdx].label + ' | Próximo: ' + circ.wires[afterIdx].label), 'success');
+    renderBench();
+  });
+
+  document.getElementById('btn-export-png').addEventListener('click', function() {
+    let source = new XMLSerializer().serializeToString(document.getElementById('bench-svg'));
+    if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    const url = URL.createObjectURL(new Blob([source], { type: 'image/svg+xml;charset=utf-8' }));
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas'); canvas.width = 1640; canvas.height = 1160;
+      const ctx = canvas.getContext('2d'); ctx.fillStyle = '#070b14'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height); URL.revokeObjectURL(url);
+      const a = document.createElement('a'); a.href = canvas.toDataURL('image/png'); a.download = 'diagrama-vivenzo.png'; a.click();
+    };
+    img.src = url;
+  });
+
+  document.getElementById('btn-export-pdf').addEventListener('click', function() {
+    const circ = getCircuit(), isFree = benchState.mode === "free", isExam = benchState.mode === "exam";
+    const techName = (document.getElementById('exam-tech-name').value || 'Equipe Manutenção Vivenzo').trim();
+    let rows = '';
+    (isFree ? benchState.freeWires : circ.wires).forEach(function(w, idx) {
+      const done = isFree || benchState.completedWires.includes(idx);
+      rows += '<tr><td>' + (idx + 1) + '</td><td>' + w.label + '</td><td><strong>' + (done ? 'CONECTADO' : 'PENDENTE') + '</strong></td></tr>';
+    });
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Relatório Vivenzo</title><style>body{font-family:Arial,sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px;}th,td{border:1px solid #cbd5e1;padding:6px;}</style></head><body><button onclick="window.print()">🖨️ Imprimir / Salvar PDF</button><h2>VIVENZO · RELATÓRIO DE MONTAGEM</h2><p>Projeto: <strong>' + (isFree ? 'Bancada Livre' : circ.name) + '</strong>' + (isExam ? (' | Técnico: <strong>' + techName + '</strong> | Nota: <strong>' + computeExamScore() + '/10</strong>') : '') + '</p>' + document.getElementById('bench-svg').outerHTML + '<table><thead><tr><th>#</th><th>Ligação</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table></body></html>');
+    win.document.close();
+  });
+
+  function resetBenchState(keepMode) {
+    benchState = {
+      circuitKey: benchState.circuitKey, mode: keepMode ? benchState.mode : "train",
+      placedIds: [], completedWires: [], freeWires: [], selectedPin: null,
+      attempts: 0, errors: 0, errorLogs: [], examStartTime: null, examEndTime: null, examRecorded: false,
+      test: { djOn: true, cisternaOk: true, caixaPedindo: true, pocoCritico: false, rtTrip: false, seloAtivo: false, rffOk: true, selMode: "AUT", revDir: "OFF" }
+    };
+    document.getElementById('bench-selected-pin').textContent = 'Nenhum borne';
+  }
+
+  document.getElementById('btn-place-required').addEventListener('click', function() {
+    startExamTimerIfNeeded();
+    getCircuit().compIds.forEach(function(id) { if (!benchState.placedIds.includes(id)) benchState.placedIds.push(id); });
+    setBenchFeedback('Componentes fixados! Conecte os bornes destacados.', 'success'); renderBench();
+  });
+  document.getElementById('mode-train-btn').addEventListener('click', function() { benchState.mode = "train"; resetBenchState(true); renderBench(); });
+  document.getElementById('mode-exam-btn').addEventListener('click', function() { benchState.mode = "exam"; resetBenchState(true); renderBench(); });
+  document.getElementById('mode-free-btn').addEventListener('click', function() { benchState.mode = "free"; resetBenchState(true); renderBench(); });
+  document.getElementById('exam-tech-name').addEventListener('input', function() { if (benchState.mode === "exam") renderBench(); });
+  document.getElementById('bench-circuit-select').addEventListener('change', function() { benchState.circuitKey = this.value; resetBenchState(true); renderBench(); });
+  document.getElementById('btn-bench-reset').addEventListener('click', function() { resetBenchState(true); renderBench(); });
+  document.getElementById('btn-bench-hint').addEventListener('click', function() {
+    if (benchState.mode !== "train") return;
+    const circ = getCircuit(), nextIdx = getNextPendingIndex(circ);
+    setBenchFeedback(nextIdx !== -1 ? ('Dica: ' + circ.wires[nextIdx].label) : 'Circuito concluído!', 'step');
+  });
+
+  // ESTÚDIO & GITHUB
+  const STORAGE_KEY = 'vivenzo_lab_custom_projects_v4', GH_TOKEN_KEY = 'vivenzo_gh_token_v1';
+  let customProjects = (function() {
+    try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch (e) {}
+    return Array.isArray(window.EMBEDDED_PROJECTS) ? window.EMBEDDED_PROJECTS : [];
+  })();
+
+  function renderCustomModules() {
+    const tabsBar = document.getElementById('main-tabs'), studioBtn = document.getElementById('btn-open-studio');
+    const container = document.getElementById('main-container'), listBox = document.getElementById('custom-projects-list');
+    tabsBar.querySelectorAll('.custom-tab').forEach(function(el) { el.remove(); });
+    container.querySelectorAll('.custom-section').forEach(function(el) { el.remove(); });
+    listBox.innerHTML = customProjects.length ? '' : '<p style="font-size:0.8rem; color:var(--muted);">Nenhum módulo extra criado.</p>';
+    customProjects.forEach(function(proj) {
+      const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'tab-btn custom-tab';
+      btn.setAttribute('data-target', proj.id); btn.textContent = proj.title; tabsBar.insertBefore(btn, studioBtn);
+      const sec = document.createElement('section'); sec.id = proj.id; sec.className = 'module custom-section';
+      sec.innerHTML = '<div class="panel"><div class="panel-title"><span>' + proj.title + '</span></div><iframe class="custom-iframe" sandbox="allow-scripts allow-forms allow-modals"></iframe></div>';
+      container.appendChild(sec); sec.querySelector('iframe').srcdoc = proj.code;
+      const item = document.createElement('div'); item.className = 'project-item'; item.innerHTML = '<strong>' + proj.title + '</strong>';
+      const del = document.createElement('button'); del.type = 'button'; del.className = 'btn btn-red'; del.textContent = 'Excluir';
+      del.addEventListener('click', function() { customProjects = customProjects.filter(function(p) { return p.id !== proj.id; }); localStorage.setItem(STORAGE_KEY, JSON.stringify(customProjects)); renderCustomModules(); switchTab('studio'); });
+      item.appendChild(del); listBox.appendChild(item);
+    });
+  }
+
+  document.getElementById('btn-save-proj').addEventListener('click', function() {
+    const title = document.getElementById('proj-title').value.trim(), code = document.getElementById('proj-code').value.trim();
+    if (!title || !code) return;
+    const id = 'custom_' + Date.now();
+    customProjects.push({ id: id, title: title, code: code });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(customProjects));
+    document.getElementById('proj-title').value = ''; document.getElementById('proj-code').value = '';
+    renderCustomModules(); switchTab(id);
+  });
+  document.getElementById('btn-clear-proj').addEventListener('click', function() { document.getElementById('proj-title').value = ''; document.getElementById('proj-code').value = ''; });
+  function buildExportableHTML() {
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelectorAll('.custom-tab, .custom-section').forEach(function(el) { el.remove(); });
+    const ds = clone.querySelector('#custom-data-script');
+    if (ds) ds.textContent = '\n  window.EMBEDDED_PROJECTS = ' + JSON.stringify(customProjects) + ';\n';
+    return '<!DOCTYPE html>\n' + clone.outerHTML;
+  }
+  document.getElementById('btn-download-site').addEventListener('click', function() {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([buildExportableHTML()], { type: 'text/html;charset=utf-8' })); a.download = 'index.html'; a.click();
+  });
+  document.getElementById('btn-publish-gh').addEventListener('click', async function() {
+    const token = document.getElementById('gh-token').value.trim(), msgEl = document.getElementById('gh-msg');
+    if (!token) { msgEl.textContent = 'Cole seu GitHub Token.'; msgEl.className = 'status-msg err'; return; }
+    localStorage.setItem(GH_TOKEN_KEY, token); msgEl.textContent = 'Publicando...'; msgEl.className = 'status-msg ok';
+    try {
+      const url = 'https://api.github.com/repos/edu00711811-oss/vivenzo-laboratorio-automacoes/contents/index.html';
+      const headers = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' };
+      let sha = null; const g = await fetch(url, { headers: headers }); if (g.ok) sha = (await g.json()).sha;
+      const body = { message: 'Atualização via Vivenzo Bancada', content: btoa(unescape(encodeURIComponent(buildExportableHTML()))) }; if (sha) body.sha = sha;
+      const p = await fetch(url, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+      if (!p.ok) throw new Error('Erro na API GitHub');
+      msgEl.textContent = 'Publicado com sucesso!'; msgEl.className = 'status-msg ok';
+    } catch (e) { msgEl.textContent = 'Erro: ' + e.message; msgEl.className = 'status-msg err'; }
+  });
+
+  // SIMULADORES OPERACIONAIS M1 & M2
+  function setTableState(id, ok, t1, t2) { const el = document.getElementById(id); if (el) { el.textContent = ok ? t1 : t2; el.className = ok ? 'state-live' : 'state-dead'; } }
+  let m1 = { dj: true, level: 25, boiaClosed: true };
+  function updateM1() {
+    if (m1.level <= 30) m1.boiaClosed = true; else if (m1.level >= 85) m1.boiaClosed = false;
+    const pumpOn = m1.dj && m1.boiaClosed;
+    document.getElementById('m1-water').style.height = m1.level + '%';
+    document.getElementById('m1-lvl-txt').textContent = 'Nível: ' + Math.round(m1.level) + '%';
+    const bi = document.getElementById('m1-boia-icon'); bi.style.bottom = Math.min(88, Math.max(8, m1.level - 3)) + '%'; bi.style.transform = m1.boiaClosed ? 'rotate(35deg)' : 'rotate(-35deg)';
+    const badge = document.getElementById('m1-status-badge');
+    badge.textContent = !m1.dj ? 'DISJUNTOR OFF' : (pumpOn ? 'ABASTECENDO' : 'CAIXA CHEIA');
+    badge.className = 'badge ' + (!m1.dj ? 'badge-off' : (pumpOn ? 'badge-on' : 'badge-warn'));
+    document.getElementById('m1-rotor').classList.toggle('spinning', pumpOn);
+    document.getElementById('m1-pump-state').textContent = pumpOn ? 'EM OPERAÇÃO (220V)' : 'DESLIGADA';
+    document.getElementById('m1-pump-state').style.color = pumpOn ? 'var(--green)' : 'var(--muted)';
+    document.getElementById('svg-m1-dj').textContent = m1.dj ? 'FECHADO (ON)' : 'ABERTO (OFF)';
+    document.getElementById('svg-m1-cont').textContent = pumpOn ? 'ATRACADA' : 'DESARMADA';
+    document.getElementById('svg-m1-pump').textContent = pumpOn ? 'BOMBANDO' : 'PARADA';
+    document.getElementById('svg-m1-boia').textContent = m1.boiaClosed ? 'NA FECHADO (AZUL+PRETO)' : 'ABERTO (CAIXA CHEIA)';
+    document.getElementById('w-m1-l1').setAttribute('class', m1.dj ? 'wire-live' : 'wire-off');
+    document.getElementById('w-m1-a1').setAttribute('class', m1.dj ? 'wire-live' : 'wire-off');
+    document.getElementById('w-m1-t1').setAttribute('class', pumpOn ? 'wire-live' : 'wire-off');
+    document.getElementById('w-m1-t2').setAttribute('class', pumpOn ? 'wire-neutral' : 'wire-off');
+    document.getElementById('w-m1-boia-out').setAttribute('class', pumpOn ? 'wire-cmd' : 'wire-off');
+    document.getElementById('d-m1-l12').textContent = m1.dj ? '220 V' : '0 V';
+    document.getElementById('d-m1-coil').textContent = pumpOn ? '220 V' : '0 V';
+    document.getElementById('d-m1-boia').textContent = m1.boiaClosed ? 'Fechado (≤30%)' : 'Aberto (≥85%)';
+    document.getElementById('d-m1-t12').textContent = pumpOn ? '220 V' : '0 V';
+    setTableState('bt-m1-3', m1.dj, '220V', '0V'); setTableState('bt-m1-4', m1.dj, 'Conectado', 'Aberto');
+    setTableState('bt-m1-6', m1.dj, 'Neutro OK', 'Aberto'); setTableState('bt-m1-7', m1.boiaClosed, 'Fechado', 'Aberto'); setTableState('bt-m1-8', pumpOn, '220V', '0V');
+  }
+  document.getElementById('btn-m1-dj').addEventListener('click', function() { m1.dj = !m1.dj; this.textContent = m1.dj ? 'LIGADO (ON)' : 'DESLIGADO (OFF)'; this.className = m1.dj ? 'btn btn-full btn-green' : 'btn btn-full btn-red'; updateM1(); });
+  document.getElementById('btn-m1-20').addEventListener('click', function() { m1.level = 20; m1.boiaClosed = true; updateM1(); });
+  document.getElementById('btn-m1-90').addEventListener('click', function() { m1.level = 90; m1.boiaClosed = false; updateM1(); });
+
+  let m2 = { dj: true, mode: 'AUT', level: 35, boiaClosed: false, faultL2: false, faultRT: false, pumpOn: false };
+  function setM2Mode(mode) { m2.mode = mode; ['MAN', '0', 'AUT'].forEach(function(m) { document.getElementById('sel-' + m.toLowerCase()).classList.toggle('active', m === mode); }); updateM2(); }
+  function updateM2() {
+    if (m2.level >= 65) m2.boiaClosed = true; else if (m2.level <= 22) m2.boiaClosed = false;
+    const rffOk = m2.dj && !m2.faultL2, rtOk = !m2.faultRT;
+    m2.pumpOn = rffOk && rtOk && (m2.mode === 'MAN' || (m2.mode === 'AUT' && m2.boiaClosed));
+    document.getElementById('m2-water').style.height = m2.level + '%';
+    document.getElementById('m2-lvl-txt').textContent = 'Nível Poço: ' + Math.round(m2.level) + '%';
+    const bi2 = document.getElementById('m2-boia-icon'); bi2.style.bottom = Math.min(86, Math.max(10, m2.level - 3)) + '%'; bi2.style.transform = m2.boiaClosed ? 'rotate(-35deg)' : 'rotate(35deg)';
+    document.getElementById('m2-flood-alert').classList.toggle('show', m2.boiaClosed && m2.level >= 65);
+    const badge = document.getElementById('m2-status-badge');
+    if (!m2.dj) { badge.textContent = 'DISJUNTOR 63A OFF'; badge.className = 'badge badge-off'; }
+    else if (!rffOk) { badge.textContent = 'FALHA DE FASE L2!'; badge.className = 'badge badge-off'; }
+    else if (!rtOk) { badge.textContent = 'DESARME TÉRMICO!'; badge.className = 'badge badge-off'; }
+    else if (m2.pumpOn) { badge.textContent = 'DRENANDO (380V)'; badge.className = 'badge badge-on'; }
+    else { badge.textContent = 'AGUARDANDO NÍVEL'; badge.className = 'badge badge-warn'; }
+    document.getElementById('m2-rotor').classList.toggle('spinning', m2.pumpOn);
+    document.getElementById('m2-pump-state').textContent = m2.pumpOn ? 'DRENANDO (380V)' : 'PARADA';
+    document.getElementById('m2-pump-state').style.color = m2.pumpOn ? 'var(--green)' : 'var(--muted)';
+    document.getElementById('svg-m2-dj').textContent = m2.dj ? 'FECHADO (63A)' : 'ABERTO';
+    document.getElementById('svg-m2-cont').textContent = m2.pumpOn ? 'ATRACADA (380V)' : 'ABERTA';
+    document.getElementById('svg-m2-rt').textContent = rtOk ? '95-96 FECHADO' : '95-96 ABERTO!';
+    document.getElementById('svg-m2-pump').textContent = m2.pumpOn ? 'DRENANDO' : 'PARADA';
+    document.getElementById('svg-m2-rff').textContent = rffOk ? 'OK (15-18 FECH.)' : 'ABERTO (FALHA)';
+    document.getElementById('svg-m2-sel').textContent = m2.mode;
+    document.getElementById('svg-m2-boia').textContent = m2.boiaClosed ? 'FECHADA (AZUL+MARROM → A1)' : 'ABERTA (NÍVEL NORMAL)';
+    document.getElementById('w2-l2').setAttribute('class', m2.faultL2 ? 'wire-off' : 'wire-l2');
+    document.getElementById('w2-p2').setAttribute('class', (m2.dj && !m2.faultL2) ? 'wire-l2' : 'wire-off');
+    document.getElementById('w2-p1').setAttribute('class', m2.dj ? 'wire-live' : 'wire-off');
+    document.getElementById('w2-p3').setAttribute('class', m2.dj ? 'wire-l3' : 'wire-off');
+    document.getElementById('w2-rt-in').setAttribute('class', (m2.dj && !m2.faultL2) ? 'wire-l2' : 'wire-off');
+    document.getElementById('w2-rt-out').setAttribute('class', (m2.dj && !m2.faultL2 && rtOk) ? 'wire-l2' : 'wire-off');
+    ['w2-t1', 'w2-t2', 'w2-t3'].forEach(function(id, i) { document.getElementById(id).setAttribute('class', m2.pumpOn ? ['wire-live', 'wire-l2', 'wire-l3'][i] : 'wire-off'); });
+    document.getElementById('w2-a1').setAttribute('class', (rffOk && m2.mode === 'AUT' && m2.boiaClosed) ? 'wire-cmd' : 'wire-off');
+    document.getElementById('d-m2-dj').textContent = m2.dj ? 'Fechado (380V)' : 'Aberto (0V)';
+    document.getElementById('d-m2-rff').textContent = rffOk ? 'OK (15-18)' : 'Desarmado';
+    document.getElementById('d-m2-rt').textContent = rtOk ? 'Fechado (95-96)' : 'Desarmado';
+    document.getElementById('d-m2-boia').textContent = m2.boiaClosed ? 'Fechada (Crítico)' : 'Aberta (<65%)';
+    document.getElementById('d-m2-cont').textContent = m2.pumpOn ? '380V (F+F)' : '0V';
+    setTableState('bt-m2-2', rffOk, '380V OK', 'Falha'); setTableState('bt-m2-rt', rffOk && rtOk, 'Fechado', 'Aberto');
+    setTableState('bt-m2-5', rffOk, 'Fechado', 'Aberto'); setTableState('bt-m2-7', rffOk && m2.mode === 'AUT', 'Ativo', 'Inativo');
+    setTableState('bt-m2-11', rffOk && m2.mode === 'AUT' && m2.boiaClosed, 'Fechada!', 'Aberta'); setTableState('bt-m2-13', m2.pumpOn, '380V 3Ø', '0V');
+  }
+  document.getElementById('btn-m2-dj').addEventListener('click', function() { m2.dj = !m2.dj; this.textContent = m2.dj ? 'LIGADO (63A ON)' : 'DESLIGADO (OFF)'; this.className = m2.dj ? 'btn btn-full btn-green' : 'btn btn-full btn-red'; updateM2(); });
+  document.getElementById('sel-man').addEventListener('click', function() { setM2Mode('MAN'); });
+  document.getElementById('sel-0').addEventListener('click', function() { setM2Mode('0'); });
+  document.getElementById('sel-aut').addEventListener('click', function() { setM2Mode('AUT'); });
+  document.getElementById('btn-f-l2').addEventListener('click', function() { m2.faultL2 = !m2.faultL2; this.className = m2.faultL2 ? 'btn btn-red' : 'btn btn-slate'; updateM2(); });
+  document.getElementById('btn-f-rt').addEventListener('click', function() { m2.faultRT = !m2.faultRT; this.className = m2.faultRT ? 'btn btn-red' : 'btn btn-slate'; updateM2(); });
+  document.getElementById('sc-low').addEventListener('click', function() { setM2Mode('AUT'); m2.faultL2 = false; m2.faultRT = false; m2.level = 18; m2.boiaClosed = false; updateM2(); });
+  document.getElementById('sc-crit').addEventListener('click', function() { setM2Mode('AUT'); m2.faultL2 = false; m2.faultRT = false; m2.level = 68; m2.boiaClosed = true; updateM2(); });
+  document.getElementById('sc-rt').addEventListener('click', function() { setM2Mode('AUT'); m2.faultL2 = false; m2.faultRT = true; document.getElementById('btn-f-rt').className = 'btn btn-red'; updateM2(); });
+  document.getElementById('sc-phase').addEventListener('click', function() { setM2Mode('AUT'); m2.faultL2 = true; document.getElementById('btn-f-l2').className = 'btn btn-red'; updateM2(); });
+
+  setInterval(function() {
+    m1.level = Math.max(0, m1.level - parseFloat(document.getElementById('m1-drain').value) * 0.25);
+    if (m1.dj && m1.boiaClosed) m1.level = Math.min(100, m1.level + 1.8);
+    updateM1();
+    m2.level = Math.min(100, m2.level + parseFloat(document.getElementById('m2-inflow').value) * 0.25);
+    if (m2.pumpOn) m2.level = Math.max(0, m2.level - 2.3);
+    updateM2();
+    if (benchState.mode === "exam" && benchState.examStartTime && !benchState.examEndTime) {
+      const timerEl = document.getElementById('exam-timer-val');
+      if (timerEl) timerEl.textContent = getExamElapsedText();
+    }
+  }, 250);
+
+  try { const st = localStorage.getItem(GH_TOKEN_KEY); if (st) document.getElementById('gh-token').value = st; } catch (e) {}
+  renderBench(); renderCustomModules(); updateM1(); updateM2();
+})();
+</script>
+</body>
+</html>
